@@ -9,3 +9,9 @@ redirect_from:
 ---
 
 Here is a bio of Mustafa Ozgur Bozcaga
+
+Research agenda
+
+Current research questions
+
+Affiliations
