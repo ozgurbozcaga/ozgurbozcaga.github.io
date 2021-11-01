@@ -5,12 +5,8 @@ permalink: /publications/
 author_profile: true
 ---
 
-{% if author.googlescholar %}
-  You can also find my articles on <u><a href="{{author.googlescholar}}">my Google Scholar profile</a>.</u>
-{% endif %}
+Negative demand shocks and renewables' effect on reducing fossil fuel use in electricity generation. (Job market paper)
 
-{% include base_path %}
+Green taxes and yellow vests: The effect of the French carbon tax on capital market responses and firm performance.
 
-{% for post in site.publications reversed %}
-  {% include archive-single.html %}
-{% endfor %}
+Asymmetric price elasticity of supply and drilling rates in shale oil. (with Michi Toya)
