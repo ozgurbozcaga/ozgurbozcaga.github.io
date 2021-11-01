@@ -2,7 +2,7 @@
 layout: archive
 title: "Research"
 permalink: /publications/
-author_profile: true
+#author_profile: true
 ---
 
 Negative demand shocks and renewables' effect on reducing fossil fuel use in electricity generation. (Job market paper)
