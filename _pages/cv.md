@@ -9,4 +9,4 @@ redirect_from:
 
 {% include base_path %}
 
-To access my CV please click on this [link](https://www.dropbox.com/s/aqq0irndkmbsiew/OzgurBozcaga_CV_Aug21.pdf?dl=0)
+To access my CV please click on this [link](https://www.dropbox.com/s/7va69qmlz7f3iuo/Bozcaga_CV_Feb22.pdf?dl=0)
