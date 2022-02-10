@@ -10,3 +10,5 @@ Negative demand shocks and renewables' effect on reducing fossil fuel use in ele
 Green taxes and yellow vests: The effect of the French carbon tax on capital market responses and firm performance. [Abstract](https://www.dropbox.com/s/mxv59382cy1pgcj/French_CT_Abstract.pdf?dl=0) 
 
 Asymmetric price elasticity of supply and drilling rates in shale oil. (with Michi Toya) [Abstract](https://www.dropbox.com/s/9gbbt5rb3ymxaa0/NDShale_Abstract%20%281%29.pdf?dl=0)
+
+Equal citizens, equal support?: Electoral Returns of the Conditional Cash Transfer Program in Turkey. (MA Thesis - [Summary](https://www.dropbox.com/s/2msh7i1tzd5hb77/MA%20Thesis%20Summary.pdf?dl=0)
