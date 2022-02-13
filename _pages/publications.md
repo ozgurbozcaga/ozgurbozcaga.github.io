@@ -11,4 +11,6 @@ Green taxes and yellow vests: The effect of the French carbon tax on capital mar
 
 Asymmetric price elasticity of supply and drilling rates in shale oil. (with Michi Toya) [[Abstract](https://www.dropbox.com/s/9gbbt5rb3ymxaa0/NDShale_Abstract%20%281%29.pdf?dl=0)]
 
+Negative price shocks, liquidity constraints and agricultural outcomes: The case of coffee production in Ethiopia. [[Abstract](https://www.dropbox.com/s/y30zxwi5cvymksl/Coffee_price_abstract.pdf?dl=0)]
+
 Equal citizens, equal support?: Electoral Returns of the Conditional Cash Transfer Program in Turkey. (MA Thesis) [[Summary](https://www.dropbox.com/s/2msh7i1tzd5hb77/MA%20Thesis%20Summary.pdf?dl=0)]
