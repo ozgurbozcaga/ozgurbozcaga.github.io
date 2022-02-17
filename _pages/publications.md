@@ -15,7 +15,7 @@ permalink: /publications/
 [[Abstract](https://www.dropbox.com/s/9gbbt5rb3ymxaa0/NDShale_Abstract%20%281%29.pdf?dl=0)]
 
 - Price shocks, liquidity constraints and agricultural outcomes: The case of coffee production in Ethiopia. 
-[[Abstract](https://www.dropbox.com/s/y30zxwi5cvymksl/Coffee_price_abstract.pdf?dl=0)]
+[[Abstract](https://www.dropbox.com/s/zg6mn5wr07h9diu/Coffee_price_abstract.pdf?dl=0)]
 
 - Equal citizens, equal support?: Electoral Returns of the Conditional Cash Transfer Program in Turkey. (MA Thesis) 
 [[Summary](https://www.dropbox.com/s/2msh7i1tzd5hb77/MA%20Thesis%20Summary.pdf?dl=0)]
