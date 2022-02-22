@@ -5,7 +5,7 @@ permalink: /publications/
 #author_profile: true
 ---
 
-- Negative demand shocks and renewables' effect on reducing fossil fuel use in electricity generation. 
+- How does the increased share of renewable energy impact electricity markets and climate?: A natural experiment using the COVID-19 negative demand shock. 
 (Job market paper) [[Link](https://www.dropbox.com/s/a4a4o1sgft1z7nw/Bozcaga_JMP_0222.pdf?dl=0)]
 
 - Green taxes and yellow vests: The effect of the French carbon tax on capital market responses and firm performance. 
