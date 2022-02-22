@@ -6,7 +6,7 @@ permalink: /publications/
 ---
 
 - Negative demand shocks and renewables' effect on reducing fossil fuel use in electricity generation. 
-(Job market paper) [[Abstract](https://www.dropbox.com/s/mthossn74lz351g/Turkey_Electricity_Abstract.pdf?dl=0)]
+(Job market paper) [[Link](https://www.dropbox.com/s/a4a4o1sgft1z7nw/Bozcaga_JMP_0222.pdf?dl=0)]
 
 - Green taxes and yellow vests: The effect of the French carbon tax on capital market responses and firm performance. 
 [[Abstract](https://www.dropbox.com/s/mxv59382cy1pgcj/French_CT_Abstract.pdf?dl=0)]
