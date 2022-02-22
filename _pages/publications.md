@@ -6,7 +6,7 @@ permalink: /publications/
 ---
 
 - How does the increased share of renewable energy impact electricity markets and climate?: A natural experiment using the COVID-19 negative demand shock. 
-(Job market paper) [[Link](https://www.dropbox.com/s/a4a4o1sgft1z7nw/Bozcaga_JMP_0222.pdf?dl=0)]
+(Job market paper) [[Link](https://www.dropbox.com/s/a4a4o1sgft1z7nw/Bozcaga_JMP_0222.pdf?dl=0){:target="_blank"}]
 
 - Green taxes and yellow vests: The effect of the French carbon tax on capital market responses and firm performance. 
 [[Abstract](https://www.dropbox.com/s/mxv59382cy1pgcj/French_CT_Abstract.pdf?dl=0)]
