@@ -10,7 +10,7 @@ locale                   : "en-US"
 title                    : "Mustafa Ozgur Bozcaga"
 title_separator          : "-"
 name                     : &name "Mustafa Ozgur Bozcaga"
-description              : &description "Senior economist at McKinsey & Company"
+description              : &description "Consultant at the World Bank Group"
 url                      : https://ozgurbozcaga.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "ozgurbozcaga.github.io"
@@ -82,7 +82,7 @@ analytics:
 author:
   name             : "Mustafa Ozgur Bozcaga"
   avatar           : "profil_foto1.jpg"
-  bio              : "Senior economist at McKinsey & Company"
+  bio              : "Consultant at the World Bank Group"
   location         : "London, UK"
   employer         :
   pubmed           : 
