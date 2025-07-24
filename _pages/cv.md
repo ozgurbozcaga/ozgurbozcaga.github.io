@@ -9,4 +9,4 @@ redirect_from:
 
 {% include base_path %}
 
-To access my CV please click on this [link](https://www.dropbox.com/scl/fi/vnzytpeko3an04eg8w25s/Bozcaga_CV_Jan24.pdf?rlkey=d3ov7oxj2icieaek9bz524z1v&dl=0)
+To access my CV please click on this [link](https://www.dropbox.com/scl/fi/vxfo2gz5fvbsubwxmoymi/Bozcaga_CV_20250724.pdf?rlkey=ci6xvt9ngv022gdt27jj552dm&dl=0)
