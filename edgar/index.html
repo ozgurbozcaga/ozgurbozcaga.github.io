@@ -440,6 +440,11 @@ async function loadData() {
     allSectors = DATA.sectors;
     selectedSectors = new Set(allSectors);
     initUI();
+     document.getElementById('chart').innerHTML = `
+      <div class="no-data">
+        <div class="no-data-icon">◈</div>
+        <div>Search and select a country from the sidebar</div>
+      </div>`;
   } catch(e) {
     document.getElementById('chart').innerHTML =
       `<div class="no-data"><div class="no-data-icon">⚠</div><div>Failed to load data: ${e.message}</div></div>`;
