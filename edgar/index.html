@@ -10,21 +10,34 @@
 :root{--bg:#0d0f14;--surface:#13161d;--surface2:#1a1e28;--border:#252a38;--accent:#00e5a0;--accent2:#4f8ef7;--warn:#f7c948;--text:#e8eaf0;--text-dim:#7a8099;--text-muted:#3d4258;--font-mono:'IBM Plex Mono',monospace;--font-sans:'IBM Plex Sans',sans-serif;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:13px;min-height:100vh;overflow-x:hidden;}
-header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
-.logo{font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--accent);letter-spacing:-.5px;}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;gap:16px;}
+.logo{font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--accent);letter-spacing:-.5px;white-space:nowrap;}
 .logo span{color:var(--text-dim);}
 .header-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-left:10px;}
-.header-right{font-size:11px;color:var(--text-dim);}
+.header-left{display:flex;align-items:baseline;flex:1;}
+.header-center{display:flex;align-items:center;gap:4px;}
+.header-right{font-size:11px;color:var(--text-dim);white-space:nowrap;}
 .header-right a{color:var(--accent2);text-decoration:none;}
-.header-left{display:flex;align-items:baseline;}
+
+/* VIEW TOGGLE */
+.view-btn{font-family:var(--font-mono);font-size:11px;letter-spacing:.5px;padding:5px 14px;border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text-dim);cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.view-btn:hover{border-color:var(--accent);color:var(--text);}
+.view-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600;}
+
+/* LAYOUT */
 .app{display:grid;grid-template-columns:285px 1fr;height:calc(100vh - 49px);}
 aside{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
 aside::-webkit-scrollbar{width:4px;}
 aside::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+
+/* PANELS */
 .panel{border-bottom:1px solid var(--border);padding:12px 14px;}
 .panel-title{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
-/* Country */
+
+/* COUNTRY */
 .search-wrap{position:relative;}
 .search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--font-sans);font-size:13px;padding:7px 10px 7px 28px;outline:none;transition:border-color .15s;}
 .search-wrap input:focus{border-color:var(--accent);}
@@ -41,22 +54,27 @@ main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
 .country-item .c-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .country-badge{font-family:var(--font-mono);font-size:9px;padding:2px 5px;border-radius:2px;background:var(--border);color:var(--text-dim);flex-shrink:0;}
 .country-badge.annex-i{background:rgba(79,142,247,.15);color:var(--accent2);}
-/* Selected countries tags */
-.selected-countries{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:0;}
-.ctag{display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:3px;font-size:11px;font-family:var(--font-mono);cursor:default;border:1px solid transparent;}
+.selected-countries{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.ctag{display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:3px;font-size:11px;font-family:var(--font-mono);border:1px solid transparent;}
 .ctag .ctag-x{cursor:pointer;opacity:.6;font-size:10px;margin-left:2px;}
 .ctag .ctag-x:hover{opacity:1;}
-.country-limit{font-size:10px;color:var(--text-muted);margin-top:5px;}
-/* Comparison toggle */
+/* Map note shown in chart view country panel */
+.map-note{font-size:10px;color:var(--text-muted);margin-top:6px;display:none;}
+.map-note.visible{display:block;}
+
+/* COMPARISON */
 .cmp-panel{display:none;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(79,142,247,.05);}
 .cmp-panel.visible{display:block;}
 .cmp-panel .panel-title{color:var(--accent2);margin-bottom:6px;}
-/* Year/controls */
+
+/* YEAR RANGE */
 .year-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
 .year-label{font-family:var(--font-mono);font-size:11px;color:var(--accent);min-width:36px;}
 input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);border-radius:2px;outline:none;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;transition:transform .1s;}
 input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+
+/* BUTTONS */
 .btn-group{display:flex;gap:4px;flex-wrap:wrap;}
 .btn{font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;padding:4px 9px;border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text-dim);cursor:pointer;transition:all .15s;text-transform:uppercase;}
 .btn:hover{border-color:var(--accent);color:var(--text);}
@@ -65,7 +83,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .btn.warn-btn{border-color:rgba(247,201,72,.4);color:var(--warn);}
 .btn.warn-btn.active{background:var(--warn);color:var(--bg);border-color:var(--warn);}
 .unit-note{font-size:10px;color:var(--text-muted);margin-top:5px;line-height:1.5;}
-/* Sector tree */
+
+/* SECTOR TREE */
 .sector-panel{flex:1;display:flex;flex-direction:column;min-height:0;border-bottom:none;padding:10px 0 0;}
 .sector-panel .panel-title{padding:0 14px;margin-bottom:6px;}
 .sector-actions{display:flex;gap:4px;flex-wrap:wrap;padding:0 14px 8px;border-bottom:1px solid var(--border);}
@@ -91,7 +110,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .node-label code{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);margin-right:3px;}
 .node-label.is-parent{font-weight:500;}
 .agg-badge{font-family:var(--font-mono);font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(0,229,160,.1);color:var(--accent);flex-shrink:0;letter-spacing:.5px;}
-/* Chart area */
+
+/* CHART HEADER */
 .chart-header{padding:12px 20px 10px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
 .chart-title{font-size:16px;font-weight:500;color:var(--text);line-height:1.2;}
 .chart-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:3px;}
@@ -100,7 +120,25 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .stat-val{font-family:var(--font-mono);font-size:17px;font-weight:600;color:var(--accent);}
 .stat-val.blue{color:var(--accent2);}
 .stat-lbl{font-size:10px;color:var(--text-muted);margin-top:1px;}
+
+/* VIEWS */
+#chartView{display:flex;flex-direction:column;flex:1;min-height:0;}
+#mapView{display:none;flex-direction:column;flex:1;min-height:0;}
+#mapView.visible{display:flex;}
 #chart{flex:1;min-height:0;}
+#map{flex:1;min-height:0;}
+
+/* MAP TOOLBAR */
+.map-toolbar{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap;}
+.map-toolbar .btn-group{gap:4px;}
+.map-year-wrap{display:flex;align-items:center;gap:10px;flex:1;min-width:200px;}
+.map-year-lbl{font-family:var(--font-mono);font-size:12px;color:var(--accent);min-width:38px;}
+.play-btn{font-family:var(--font-mono);font-size:11px;padding:4px 12px;border:1px solid var(--accent);border-radius:3px;background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.play-btn:hover{background:var(--accent);color:var(--bg);}
+.play-btn.playing{background:var(--accent);color:var(--bg);}
+.map-metric-info{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);}
+
+/* STATES */
 .loading,.no-data{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:var(--text-dim);}
 .spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -113,23 +151,29 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <div class="logo">EDGAR<span>.GHG</span></div>
     <div class="header-meta">Emissions Explorer · 1970–2024</div>
   </div>
+  <div class="header-center">
+    <button class="view-btn active" id="btnChartView">&#9654; Chart</button>
+    <button class="view-btn" id="btnMapView">&#9632; Map</button>
+  </div>
   <div class="header-right">
-    Data: <a href="https://edgar.jrc.ec.europa.eu/dataset_ghg2025" target="_blank">JRC EDGAR v2025</a>
-    &nbsp;·&nbsp; GWP-100 AR5 · Gg CO₂eq
+    <a href="https://edgar.jrc.ec.europa.eu/dataset_ghg2025" target="_blank">JRC EDGAR v2025</a>
+    &nbsp;·&nbsp; GWP-100 AR5
   </div>
 </header>
+
 <div class="app">
 <aside>
 
-  <!-- COUNTRY -->
-  <div class="panel">
+  <!-- COUNTRY (chart view) -->
+  <div class="panel" id="countryPanel">
     <div class="panel-title">Countries <span style="color:var(--text-muted);font-size:8px;">(UP TO 5)</span></div>
     <div class="search-wrap"><input id="countrySearch" type="text" placeholder="Search and click to add…" autocomplete="off"></div>
     <div class="country-list" id="countryList"></div>
     <div class="selected-countries" id="selectedTags"></div>
+    <div class="map-note" id="mapNote">Map shows all countries. Use sector tree to filter sectors.</div>
   </div>
 
-  <!-- COMPARISON MODE — appears when 2+ countries selected -->
+  <!-- COMPARISON (chart view only) -->
   <div class="cmp-panel" id="cmpPanel">
     <div class="panel-title">Comparison Mode</div>
     <div class="btn-group" id="cmpToggle">
@@ -139,15 +183,15 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <div class="unit-note" id="cmpNote">One aggregated trace per country.</div>
   </div>
 
-  <!-- YEAR RANGE -->
-  <div class="panel">
+  <!-- YEAR RANGE (chart view only) -->
+  <div class="panel" id="yearPanel">
     <div class="panel-title">Year Range</div>
     <div class="year-row"><div class="year-label" id="yearFromLbl">1970</div><input type="range" id="yearFrom" min="1970" max="2024" value="1970"></div>
     <div class="year-row"><div class="year-label" id="yearToLbl">2024</div><input type="range" id="yearTo" min="1970" max="2024" value="2024"></div>
   </div>
 
-  <!-- CHART TYPE -->
-  <div class="panel">
+  <!-- CHART TYPE + UNITS -->
+  <div class="panel" id="chartControls">
     <div class="panel-title">Chart Type</div>
     <div class="btn-group" id="chartType">
       <button class="btn active" data-type="bar_stacked">Stacked</button>
@@ -169,7 +213,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <div class="unit-note">AR5 GWP-100</div>
   </div>
 
-  <!-- SECTORS TREE -->
+  <!-- SECTOR TREE -->
   <div class="panel sector-panel">
     <div class="panel-title">Sectors</div>
     <div class="sector-actions">
@@ -182,18 +226,39 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
   </div>
 
 </aside>
+
 <main>
-  <div class="chart-header">
-    <div>
-      <div class="chart-title" id="chartTitle">Select a country to begin</div>
-      <div class="chart-subtitle" id="chartSubtitle">GHG Emissions by Sector · IPCC 2006</div>
+  <!-- CHART VIEW -->
+  <div id="chartView">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title" id="chartTitle">Select a country to begin</div>
+        <div class="chart-subtitle" id="chartSubtitle">GHG Emissions by Sector · IPCC 2006</div>
+      </div>
+      <div class="stats" id="statsBox" style="display:none">
+        <div class="stat"><div class="stat-val" id="statLatest">—</div><div class="stat-lbl" id="statLatestLbl">2024 Total</div></div>
+        <div class="stat"><div class="stat-val blue" id="statPeak">—</div><div class="stat-lbl">Peak Year</div></div>
+      </div>
     </div>
-    <div class="stats" id="statsBox" style="display:none">
-      <div class="stat"><div class="stat-val" id="statLatest">—</div><div class="stat-lbl" id="statLatestLbl">2024 Total</div></div>
-      <div class="stat"><div class="stat-val blue" id="statPeak">—</div><div class="stat-lbl">Peak Year</div></div>
-    </div>
+    <div id="chart"><div class="no-data"><div class="no-data-icon">◈</div><div>Search and select a country from the sidebar</div></div></div>
   </div>
-  <div id="chart"><div class="no-data"><div class="no-data-icon">◈</div><div>Search and select a country from the sidebar</div></div></div>
+
+  <!-- MAP VIEW -->
+  <div id="mapView">
+    <div class="map-toolbar">
+      <div class="btn-group" id="mapMetricToggle">
+        <button class="btn active" data-metric="absolute">Absolute Emissions</button>
+        <button class="btn" data-metric="share">Share of Global (%)</button>
+      </div>
+      <div class="map-year-wrap">
+        <div class="map-year-lbl" id="mapYearLbl">2024</div>
+        <input type="range" id="mapYearSlider" min="1970" max="2024" value="2024" style="flex:1;">
+        <button class="play-btn" id="playBtn">&#9654; Play</button>
+      </div>
+      <div class="map-metric-info" id="mapMetricInfo"></div>
+    </div>
+    <div id="map"></div>
+  </div>
 </main>
 </div>
 
@@ -263,20 +328,21 @@ const TREE=[
   ]},
 ];
 
-// ── COLORS ──
 const LEAF_COLORS={'1.A.1.a':'#FFB800','1.A.1.bc':'#E68A00','1.A.2':'#FF6B35','1.A.3.a':'#64B5F6','1.A.3.b_noRES':'#1E88E5','1.A.3.c':'#7B68EE','1.A.3.d':'#26C6DA','1.A.3.e':'#80DEEA','1.A.4':'#EF5350','1.A.5':'#A1887F','1.B.1':'#6D4C41','1.B.2':'#8E24AA','2.A.1':'#B0BEC5','2.A.2':'#CFD8DC','2.A.3':'#80CBC4','2.A.4':'#A5D6A7','2.B':'#CE93D8','2.C':'#90CAF9','2.D':'#FFCC80','2.E':'#81D4FA','2.F':'#F48FB1','2.G':'#B39DDB','3.A.1':'#2E7D32','3.A.2':'#558B2F','3.C.2':'#9CCC65','3.C.3':'#C5E1A5','3.C.4':'#7CB342','3.C.5':'#AED581','3.C.6':'#DCE775','3.C.7':'#F9A825','4.A':'#757575','4.B':'#4CAF50','4.C':'#FF7043','4.D':'#26A69A','4.E':'#9E9E9E','5.A':'#00BCD4','5.B':'#F44336'};
 const PARENT_COLORS={'1':'#FFB800','1.A':'#FF8C00','1.A.1':'#FFD54F','1.A.3':'#42A5F5','1.B':'#8E24AA','2':'#4f8ef7','2.A':'#B0BEC5','3':'#388E3C','3.A':'#2E7D32','3.C':'#7CB342','4':'#78909C','5':'#F44336'};
-
-// 5 distinct country colors
 const COUNTRY_COLORS=['#00e5a0','#4f8ef7','#f7c948','#f87171','#c084fc'];
 
 // ── STATE ──
 let DATA=null;
-let selectedCountries=[]; // array of country names, max 5
+let selectedCountries=[];
 let yearFrom=1970,yearTo=2024;
 let chartType='bar_stacked',unit='Gg',emissionSource='fossil';
 let leafChecked={},nodeExpanded={},singleTotal=false;
-let cmpMode='totals'; // 'totals' or 'sectors' — only relevant when 2+ countries
+let cmpMode='totals';
+let currentView='chart'; // 'chart' or 'map'
+let mapMetric='absolute'; // 'absolute' or 'share'
+let mapYear=2024;
+let playInterval=null;
 
 // ── TREE UTILS ──
 function getAllLeaves(node){if(!node.children)return[node.id];return node.children.flatMap(c=>getAllLeaves(c));}
@@ -320,78 +386,61 @@ function getCountryData(country){
   });
   return merged;
 }
+
+// Get total emissions for a country for a specific year index, for selected leaves
+function getCountryYearTotal(country, yi){
+  const cdata=getCountryData(country);
+  if(!cdata)return 0;
+  const leaves=allLeavesInTree().filter(l=>leafChecked[l]);
+  let sum=0;
+  for(const id of leaves) if(cdata[id]) sum+=cdata[id][yi]||0;
+  return sum;
+}
+
 function sumLeaves(leafIds,cdata,fi,len){
   const s=new Array(len).fill(0);
   for(const id of leafIds)if(cdata[id])for(let i=0;i<len;i++)s[i]+=cdata[id][fi+i]||0;
   return s;
 }
-function collectSectorTraces(cdata,fi,len,factor,colorFn){
+function collectSectorTraces(cdata,fi,len,factor){
   const traces=[];
   function walk(node){
     const isLeaf=!node.children;
-    if(isLeaf){
-      if(!leafChecked[node.id]||!cdata[node.id])return;
-      traces.push({name:node.name,color:colorFn?colorFn(node.id):LEAF_COLORS[node.id]||'#888',vals:cdata[node.id].slice(fi,fi+len).map(v=>v*factor)});
-      return;
-    }
-    const checked=getAllLeaves(node).filter(l=>leafChecked[l]);
-    if(!checked.length)return;
-    if(!nodeExpanded[node.id]){
-      traces.push({name:node.name,color:colorFn?colorFn(node.id):PARENT_COLORS[node.id]||'#888',vals:sumLeaves(checked,cdata,fi,len).map(v=>v*factor)});
-    } else {
-      for(const child of node.children)walk(child);
-    }
+    if(isLeaf){if(!leafChecked[node.id]||!cdata[node.id])return;
+      traces.push({name:node.name,color:LEAF_COLORS[node.id]||'#888',vals:cdata[node.id].slice(fi,fi+len).map(v=>v*factor)});return;}
+    const checked=getAllLeaves(node).filter(l=>leafChecked[l]);if(!checked.length)return;
+    if(!nodeExpanded[node.id]){traces.push({name:node.name,color:PARENT_COLORS[node.id]||'#888',vals:sumLeaves(checked,cdata,fi,len).map(v=>v*factor)});}
+    else{for(const child of node.children)walk(child);}
   }
-  if(singleTotal){
-    const allLeaves=allLeavesInTree().filter(l=>leafChecked[l]);
-    if(allLeaves.length)traces.push({name:'Total',color:colorFn?colorFn('total'):'#00e5a0',vals:sumLeaves(allLeaves,cdata,fi,len).map(v=>v*factor)});
-  } else {
-    for(const root of TREE)walk(root);
-  }
+  if(singleTotal){const allLeaves=allLeavesInTree().filter(l=>leafChecked[l]);if(allLeaves.length)traces.push({name:'Total',color:'#00e5a0',vals:sumLeaves(allLeaves,cdata,fi,len).map(v=>v*factor)});}
+  else{for(const root of TREE)walk(root);}
   return traces;
 }
 
 // ── CHART RENDERING ──
 function renderChart(){
   if(!DATA||!selectedCountries.length)return;
-  const years=DATA.years;
-  const fi=years.indexOf(yearFrom),ti=years.indexOf(yearTo),len=ti-fi+1;
-  const filteredYears=years.slice(fi,ti+1);
-  const factor=getFactor();
-  const isMulti=selectedCountries.length>1;
+  const years=DATA.years,fi=years.indexOf(yearFrom),ti=years.indexOf(yearTo),len=ti-fi+1;
+  const filteredYears=years.slice(fi,ti+1),factor=getFactor(),isMulti=selectedCountries.length>1;
   let traces=[];
 
   if(!isMulti){
-    // ── SINGLE COUNTRY ── same as before
-    const cdata=getCountryData(selectedCountries[0]);
-    if(!cdata){showNoData();return;}
-    const tList=collectSectorTraces(cdata,fi,len,factor,null);
-    traces=tList.map(t=>makeTrace(t,filteredYears,null,null));
+    const cdata=getCountryData(selectedCountries[0]);if(!cdata){showNoData();return;}
+    traces=collectSectorTraces(cdata,fi,len,factor).map(t=>makeTrace(t,filteredYears,null,null));
   } else if(cmpMode==='totals'){
-    // ── MULTI: one total trace per country ──
     selectedCountries.forEach((country,ci)=>{
       const cdata=getCountryData(country);if(!cdata)return;
       const allLeaves=allLeavesInTree().filter(l=>leafChecked[l]);
       const vals=sumLeaves(allLeaves,cdata,fi,len).map(v=>v*factor);
-      const color=COUNTRY_COLORS[ci];
-      traces.push(makeTrace({name:country,color,vals},filteredYears,null,null));
+      traces.push(makeTrace({name:country,color:COUNTRY_COLORS[ci],vals},filteredYears,null,null));
     });
   } else {
-    // ── MULTI: sector breakdown, one stack per country ──
     selectedCountries.forEach((country,ci)=>{
       const cdata=getCountryData(country);if(!cdata)return;
       const countryColor=COUNTRY_COLORS[ci];
-      // Use sector colors but tinted toward country color — simpler: use sector name + country in legend
-      const tList=collectSectorTraces(cdata,fi,len,factor,null);
-      tList.forEach(t=>{
-        const tr=makeTrace(
-          {name:`${country} · ${t.name}`,color:t.color,vals:t.vals},
-          filteredYears,
-          country, // legendgroup
-          ci        // offsetgroup index
-        );
-        // Tint opacity by country index so countries are visually distinguishable
-        if(tr.type==='bar') tr.marker={color:t.color,opacity:1-ci*0.15};
+      collectSectorTraces(cdata,fi,len,factor).forEach(t=>{
+        const tr=makeTrace({name:`${country} · ${t.name}`,color:t.color,vals:t.vals},filteredYears,country,ci);
+        if(tr.type==='bar')tr.marker={color:t.color,opacity:1-ci*0.15};
         tr.legendgrouptitle={text:country,font:{color:countryColor,size:10}};
         traces.push(tr);
       });
@@ -399,7 +448,6 @@ function renderChart(){
   }
 
   if(!traces.length){showNoData();return;}
-
   const layout={
     barmode:chartType==='bar_grouped'?'group':'stack',
     paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
@@ -410,35 +458,26 @@ function renderChart(){
     yaxis:{gridcolor:'#252a38',linecolor:'#252a38',tickcolor:'#252a38',color:'#7a8099',
       title:{text:getUnitLabel(),font:{size:11}},tickformat:',.0f'},
     showlegend:isMulti,
-    legend:isMulti?{bgcolor:'rgba(19,22,29,0.9)',bordercolor:'#252a38',borderwidth:1,font:{size:10},x:1.01,y:1,xanchor:'left'}:false,
+    legend:isMulti?{bgcolor:'rgba(19,22,29,.9)',bordercolor:'#252a38',borderwidth:1,font:{size:10},x:1.01,y:1,xanchor:'left'}:false,
     hovermode:'x unified',
     hoverlabel:{bgcolor:'#1a1e28',bordercolor:'#252a38',font:{family:'IBM Plex Mono',size:11,color:'#e8eaf0'}}
   };
-
-  // For multi-country bars with sector breakdown, use offsetgroup
   if(isMulti&&cmpMode==='sectors'&&chartType.startsWith('bar')){
     traces.forEach(t=>{if(t.offsetgroup!==undefined)t.offsetgroup=String(t.offsetgroup);});
     layout.barmode='stack';
   }
-
   Plotly.react('chart',traces,layout,{responsive:true,displayModeBar:true,
     modeBarButtonsToRemove:['select2d','lasso2d','autoScale2d'],displaylogo:false,
     toImageButtonOptions:{filename:`EDGAR_${selectedCountries.join('_')}_${yearFrom}_${yearTo}`}});
 
-  // Header stats
   const titleStr=isMulti?selectedCountries.join(' vs '):selectedCountries[0];
   const annexStr=isMulti?'':(DATA.annex[selectedCountries[0]]||'').replace('_',' ')+' · ';
   document.getElementById('chartTitle').textContent=titleStr;
   document.getElementById('chartSubtitle').textContent=`${annexStr}GHG Emissions · ${yearFrom}–${yearTo}`;
   document.getElementById('statsBox').style.display=isMulti?'none':'flex';
-
   if(!isMulti){
     let latestTotal=0,peakTotal=0,peakYear=filteredYears[0];
-    filteredYears.forEach((yr,i)=>{
-      const sum=traces.reduce((a,t)=>a+(t.y[i]||0),0);
-      if(i===filteredYears.length-1)latestTotal=sum;
-      if(sum>peakTotal){peakTotal=sum;peakYear=yr;}
-    });
+    filteredYears.forEach((yr,i)=>{const sum=traces.reduce((a,t)=>a+(t.y[i]||0),0);if(i===filteredYears.length-1)latestTotal=sum;if(sum>peakTotal){peakTotal=sum;peakYear=yr;}});
     const fmt=n=>n>=1000?(n/1000).toFixed(1)+'k':n.toFixed(1);
     document.getElementById('statLatest').textContent=fmt(latestTotal);
     document.getElementById('statLatestLbl').textContent=`${filteredYears[filteredYears.length-1]} Total`;
@@ -455,20 +494,138 @@ function makeTrace(t,filteredYears,legendgroup,offsetgroup){
   if(chartType==='area')return{...base,type:'scatter',mode:'lines',fill:'tonexty',line:{color:t.color,width:1},fillcolor:t.color+'66'};
   return{...base,type:'bar',marker:{color:t.color}};
 }
+function showNoData(){Plotly.react('chart',[],{paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'},{responsive:true});}
 
-function showNoData(){
-  Plotly.react('chart',[],{paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'},{responsive:true});
+// ── MAP RENDERING ──
+function getMapData(){
+  if(!DATA)return null;
+  const yi=DATA.years.indexOf(mapYear);
+  if(yi<0)return null;
+
+  // Compute per-country totals for the selected year
+  const isoArr=[],nameArr=[],valArr=[];
+  for(const country of DATA.countries){
+    const iso=DATA.iso[country];if(!iso)continue;
+    const val=getCountryYearTotal(country,yi);
+    isoArr.push(iso);nameArr.push(country);valArr.push(val);
+  }
+
+  // Compute global total for share calculation
+  const globalTotal=valArr.reduce((a,b)=>a+b,0);
+  const displayVals=mapMetric==='share'
+    ? valArr.map(v=>globalTotal>0?Math.round(v/globalTotal*10000)/100:0)
+    : valArr;
+
+  // Quintile thresholds (only from countries with >0)
+  const positive=displayVals.filter(v=>v>0).sort((a,b)=>a-b);
+  const q=i=>positive[Math.floor(i*positive.length/5)]||0;
+  const thresholds=[0,q(1),q(2),q(3),q(4)];
+  const tMax=positive[positive.length-1]||1;
+
+  return{isoArr,nameArr,displayVals,valArr,thresholds,tMax,globalTotal};
 }
 
-// ── COUNTRY TAGS ──
+function renderMap(){
+  if(!DATA)return;
+  const d=getMapData();if(!d)return;
+  const{isoArr,nameArr,displayVals,valArr,thresholds,tMax,globalTotal}=d;
+  const isShare=mapMetric==='share';
+  const unitStr=isShare?'%':'Gg CO\u2082eq';
+
+  // 5-color quintile scale — teal/green for absolute, blue/purple for share
+  const colorscale=isShare
+    ?[[0,'#1a1e28'],[0.001,'#1a3a5c'],[0.25,'#1d6fa4'],[0.5,'#2196f3'],[0.75,'#64b5f6'],[1,'#e3f2fd']]
+    :[[0,'#1a1e28'],[0.001,'#1a3d2b'],[0.25,'#1b6e3a'],[0.5,'#2e9e52'],[0.75,'#66bb6a'],[1,'#e8f5e9']];
+
+  // Quintile breakpoints for tickvals (no decimals)
+  const tickvals=thresholds.map(v=>Math.round(v));
+  tickvals.push(Math.round(tMax));
+  const ticktext=tickvals.map(v=>isShare?v+'%':v.toLocaleString());
+
+  const hoverText=nameArr.map((name,i)=>{
+    const absVal=Math.round(valArr[i]).toLocaleString();
+    const shareVal=globalTotal>0?(valArr[i]/globalTotal*100).toFixed(2)+'%':'n/a';
+    return `<b>${name}</b><br>Emissions: ${absVal} Gg CO\u2082eq<br>Global share: ${shareVal}`;
+  });
+
+  const trace={
+    type:'choropleth',
+    locations:isoArr,
+    z:displayVals,
+    text:hoverText,
+    hovertemplate:'%{text}<extra></extra>',
+    colorscale,
+    zmin:0,
+    zmax:tMax,
+    colorbar:{
+      title:{text:unitStr,font:{color:'#7a8099',size:11}},
+      tickvals,ticktext,
+      tickfont:{color:'#7a8099',size:10,family:'IBM Plex Mono'},
+      bgcolor:'rgba(19,22,29,0.85)',
+      bordercolor:'#252a38',
+      borderwidth:1,
+      len:0.6,
+      thickness:14,
+    },
+    marker:{line:{color:'#252a38',width:0.5}},
+  };
+
+  const layout={
+    geo:{
+      showframe:false,
+      showcoastlines:false,
+      showland:true,landcolor:'#1a1e28',
+      showocean:true,oceancolor:'#0d0f14',
+      showcountries:true,countrycolor:'#252a38',
+      bgcolor:'#0d0f14',
+      projection:{type:'natural earth'},
+    },
+    paper_bgcolor:'#0d0f14',
+    margin:{t:0,r:0,b:0,l:0},
+    font:{family:'IBM Plex Sans',color:'#7a8099'},
+  };
+
+  Plotly.react('map',[trace],layout,{responsive:true,displayModeBar:true,
+    modeBarButtonsToRemove:['select2d','lasso2d','toImage'],displaylogo:false});
+
+  // Update info strip
+  const sectorDesc=singleTotal?'All sectors':getSelectedSectorDesc();
+  document.getElementById('mapMetricInfo').textContent=
+    `${mapYear} · ${isShare?'Share of global':'Absolute'} · ${sectorDesc} · ${emissionSource}`;
+}
+
+function getSelectedSectorDesc(){
+  const leaves=allLeavesInTree().filter(l=>leafChecked[l]);
+  const total=allLeavesInTree().length;
+  if(leaves.length===total)return'All sectors';
+  if(leaves.length===0)return'No sectors';
+  if(leaves.length<=3)return leaves.join(', ');
+  return`${leaves.length} sectors selected`;
+}
+
+// ── VIEW SWITCHING ──
+function switchView(view){
+  currentView=view;
+  document.getElementById('chartView').style.display=view==='chart'?'flex':'none';
+  document.getElementById('mapView').classList.toggle('visible',view==='map');
+  document.getElementById('btnChartView').classList.toggle('active',view==='chart');
+  document.getElementById('btnMapView').classList.toggle('active',view==='map');
+  // Sidebar adjustments
+  document.getElementById('cmpPanel').style.display=view==='map'?'none':'';
+  document.getElementById('yearPanel').style.display=view==='map'?'none':'';
+  document.getElementById('chartControls').style.display=view==='map'?'none':'';
+  document.getElementById('mapNote').classList.toggle('visible',view==='map');
+  if(view==='map')renderMap();
+}
+
+// ── COUNTRY LIST ──
 function buildCountryList(filter){
   if(!DATA)return;
   const list=document.getElementById('countryList');
   const matches=DATA.countries.filter(c=>!filter||c.toLowerCase().includes(filter));
   list.innerHTML=matches.slice(0,80).map(c=>{
     const idx=selectedCountries.indexOf(c);
-    const sel=idx>=0;
-    const dotColor=sel?COUNTRY_COLORS[idx]:'transparent';
+    const sel=idx>=0,dotColor=sel?COUNTRY_COLORS[idx]:'transparent';
     const annex=DATA.annex[c]||'';
     const badge=annex==='Annex_I'?'Annex I':annex==='Non-Annex_I'?'Non-AI':annex;
     const cls=annex==='Annex_I'?'annex-i':'';
@@ -480,105 +637,89 @@ function buildCountryList(filter){
   }).join('');
   list.querySelectorAll('.country-item').forEach(el=>{
     el.addEventListener('click',()=>{
-      const c=el.dataset.c;
-      const idx=selectedCountries.indexOf(c);
-      if(idx>=0){
-        selectedCountries.splice(idx,1);
-      } else {
-        if(selectedCountries.length>=5)return;
-        selectedCountries.push(c);
-      }
-      updateCountryUI(filter);
-      renderChart();
+      if(currentView==='map')return; // no country selection needed in map view
+      const c=el.dataset.c,idx=selectedCountries.indexOf(c);
+      if(idx>=0)selectedCountries.splice(idx,1);
+      else{if(selectedCountries.length>=5)return;selectedCountries.push(c);}
+      updateCountryUI(filter);renderChart();
     });
   });
 }
-
 function updateCountryUI(filter=''){
   buildCountryList(filter||document.getElementById('countrySearch').value.toLowerCase());
-  renderTags();
-  updateCmpPanel();
+  renderTags();updateCmpPanel();
 }
-
 function renderTags(){
   const box=document.getElementById('selectedTags');
-  box.innerHTML=selectedCountries.map((c,i)=>{
-    const color=COUNTRY_COLORS[i];
-    return `<span class="ctag" style="background:${color}18;color:${color};border-color:${color}44;">
-      ${c}<span class="ctag-x" data-c="${c}">✕</span>
-    </span>`;
-  }).join('');
-  box.querySelectorAll('.ctag-x').forEach(x=>{
-    x.addEventListener('click',()=>{
-      selectedCountries.splice(selectedCountries.indexOf(x.dataset.c),1);
-      updateCountryUI();renderChart();
-    });
-  });
+  box.innerHTML=selectedCountries.map((c,i)=>`<span class="ctag" style="background:${COUNTRY_COLORS[i]}18;color:${COUNTRY_COLORS[i]};border-color:${COUNTRY_COLORS[i]}44;">${c}<span class="ctag-x" data-c="${c}">✕</span></span>`).join('');
+  box.querySelectorAll('.ctag-x').forEach(x=>{x.addEventListener('click',()=>{selectedCountries.splice(selectedCountries.indexOf(x.dataset.c),1);updateCountryUI();renderChart();});});
 }
-
 function updateCmpPanel(){
-  const panel=document.getElementById('cmpPanel');
   const isMulti=selectedCountries.length>1;
-  panel.classList.toggle('visible',isMulti);
-  if(isMulti) updateCmpNote();
+  document.getElementById('cmpPanel').classList.toggle('visible',isMulti);
+  if(isMulti)updateCmpNote();
 }
-
 function updateCmpNote(){
-  const notes={
-    totals:'One aggregated trace per country.',
-    sectors:{
-      bar_stacked:'Each country shown as its own stacked column group.',
-      bar_grouped:'Each country shown as its own grouped bar set.',
-      line:'One line per country per sector.',
-      area:'One filled area per country per sector (semi-transparent).'
-    }
-  };
-  const note=cmpMode==='totals'?notes.totals:(notes.sectors[chartType]||'');
-  document.getElementById('cmpNote').textContent=note;
+  const notes={totals:'One aggregated trace per country.',sectors:{bar_stacked:'Each country as its own stacked column group.',bar_grouped:'Each country as its own grouped bar set.',line:'One line per country per sector.',area:'One filled area per country per sector.'}};
+  document.getElementById('cmpNote').textContent=cmpMode==='totals'?notes.totals:(notes.sectors[chartType]||'');
 }
 
 // ── TREE EVENTS ──
 function initTreeEvents(){
   document.getElementById('sectorTree').addEventListener('click',e=>{
     const expBtn=e.target.closest('[data-eid]');
-    if(expBtn&&expBtn.classList.contains('exp-btn')){
-      nodeExpanded[expBtn.dataset.eid]=!nodeExpanded[expBtn.dataset.eid];
-      refreshTree();renderChart();return;
-    }
-    const target=e.target.closest('[data-cid]');
-    if(!target)return;
+    if(expBtn&&expBtn.classList.contains('exp-btn')){nodeExpanded[expBtn.dataset.eid]=!nodeExpanded[expBtn.dataset.eid];refreshTree();if(currentView==='map')renderMap();else renderChart();return;}
+    const target=e.target.closest('[data-cid]');if(!target)return;
     const id=target.dataset.cid,isLeaf=target.dataset.leaf==='1';
-    if(isLeaf){leafChecked[id]=!leafChecked[id];}
+    if(isLeaf)leafChecked[id]=!leafChecked[id];
     else{const node=findNode(id,TREE);if(!node)return;setAllLeaves([node],getParentCbState(node)!=='on');}
-    refreshTree();renderChart();
+    refreshTree();if(currentView==='map')renderMap();else renderChart();
   });
+}
+
+// ── ANIMATION ──
+function startPlay(){
+  if(playInterval)return;
+  const btn=document.getElementById('playBtn');
+  btn.textContent='⏸ Pause';btn.classList.add('playing');
+  playInterval=setInterval(()=>{
+    mapYear=mapYear>=2024?1970:mapYear+1;
+    document.getElementById('mapYearSlider').value=mapYear;
+    document.getElementById('mapYearLbl').textContent=mapYear;
+    renderMap();
+  },400);
+}
+function stopPlay(){
+  clearInterval(playInterval);playInterval=null;
+  const btn=document.getElementById('playBtn');
+  btn.textContent='\u25B6 Play';btn.classList.remove('playing');
 }
 
 // ── LOAD ──
 async function loadData(){
-  document.getElementById('chart').innerHTML=`<div class="loading"><div class="spinner"></div><div>Loading EDGAR data…</div></div>`;
+  document.getElementById('chart').innerHTML=`<div class="loading"><div class="spinner"></div><div>Loading EDGAR data\u2026</div></div>`;
   try{
     DATA=await(await fetch('edgar_data.json')).json();
     if(DATA.data&&!DATA.fossil)DATA.fossil=DATA.data;
     if(!DATA.bio)DATA.bio={};
+    if(!DATA.iso)DATA.iso={};
     initState();refreshTree();initTreeEvents();buildCountryList('');
-    document.getElementById('chart').innerHTML=`<div class="no-data"><div class="no-data-icon">&#9672;</div><div>Search and select up to 5 countries from the sidebar</div></div>`;
+    document.getElementById('chart').innerHTML=`<div class="no-data"><div class="no-data-icon">&#9672;</div><div>Search and select a country from the sidebar</div></div>`;
   }catch(e){
     document.getElementById('chart').innerHTML=`<div class="no-data"><div class="no-data-icon">&#9888;</div><div>Failed to load data: ${e.message}</div></div>`;
   }
 }
 
 // ── CONTROLS ──
+document.getElementById('btnChartView').addEventListener('click',()=>{stopPlay();switchView('chart');});
+document.getElementById('btnMapView').addEventListener('click',()=>switchView('map'));
+
 document.getElementById('countrySearch').addEventListener('input',e=>buildCountryList(e.target.value.toLowerCase()));
-
 document.getElementById('cmpToggle').addEventListener('click',e=>{
-  if(!e.target.dataset.cmp)return;
-  cmpMode=e.target.dataset.cmp;
+  if(!e.target.dataset.cmp)return;cmpMode=e.target.dataset.cmp;
   document.querySelectorAll('#cmpToggle .btn').forEach(b=>{b.classList.remove('active-blue');b.classList.remove('active');});
-  e.target.classList.add('active-blue');
-  updateCmpNote();renderChart();
+  e.target.classList.add('active-blue');updateCmpNote();renderChart();
 });
-
 document.getElementById('yearFrom').addEventListener('input',e=>{
   yearFrom=+e.target.value;if(yearFrom>yearTo){yearTo=yearFrom;document.getElementById('yearTo').value=yearTo;}
   document.getElementById('yearFromLbl').textContent=yearFrom;document.getElementById('yearToLbl').textContent=yearTo;renderChart();
@@ -588,8 +729,7 @@ document.getElementById('yearTo').addEventListener('input',e=>{
   document.getElementById('yearFromLbl').textContent=yearFrom;document.getElementById('yearToLbl').textContent=yearTo;renderChart();
 });
 document.getElementById('chartType').addEventListener('click',e=>{
-  if(!e.target.dataset.type)return;
-  chartType=e.target.dataset.type;
+  if(!e.target.dataset.type)return;chartType=e.target.dataset.type;
   document.querySelectorAll('#chartType .btn').forEach(b=>b.classList.remove('active'));
   e.target.classList.add('active');updateCmpNote();renderChart();
 });
@@ -601,23 +741,40 @@ document.getElementById('unitToggle').addEventListener('click',e=>{
 document.getElementById('sourceToggle').addEventListener('click',e=>{
   if(!e.target.dataset.src)return;emissionSource=e.target.dataset.src;
   document.querySelectorAll('#sourceToggle .btn').forEach(b=>b.classList.remove('active'));
-  e.target.classList.add('active');renderChart();
+  e.target.classList.add('active');if(currentView==='map')renderMap();else renderChart();
 });
 document.getElementById('btn5sec').addEventListener('click',()=>{
   singleTotal=false;document.getElementById('btnSingle').classList.remove('active');
-  setAllLeaves(TREE,true);setAllExpanded(TREE,false);refreshTree();renderChart();
+  setAllLeaves(TREE,true);setAllExpanded(TREE,false);refreshTree();
+  if(currentView==='map')renderMap();else renderChart();
 });
 document.getElementById('btnSingle').addEventListener('click',()=>{
   singleTotal=!singleTotal;document.getElementById('btnSingle').classList.toggle('active',singleTotal);
-  if(singleTotal)setAllLeaves(TREE,true);refreshTree();renderChart();
+  if(singleTotal)setAllLeaves(TREE,true);refreshTree();
+  if(currentView==='map')renderMap();else renderChart();
 });
 document.getElementById('btnExpAll').addEventListener('click',()=>{
   singleTotal=false;document.getElementById('btnSingle').classList.remove('active');
-  setAllLeaves(TREE,true);setAllExpanded(TREE,true);refreshTree();renderChart();
+  setAllLeaves(TREE,true);setAllExpanded(TREE,true);refreshTree();
+  if(currentView==='map')renderMap();else renderChart();
 });
 document.getElementById('btnNone').addEventListener('click',()=>{
   singleTotal=false;document.getElementById('btnSingle').classList.remove('active');
-  setAllLeaves(TREE,false);refreshTree();renderChart();
+  setAllLeaves(TREE,false);refreshTree();
+  if(currentView==='map')renderMap();else renderChart();
+});
+
+// Map-specific controls
+document.getElementById('mapMetricToggle').addEventListener('click',e=>{
+  if(!e.target.dataset.metric)return;mapMetric=e.target.dataset.metric;
+  document.querySelectorAll('#mapMetricToggle .btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');renderMap();
+});
+document.getElementById('mapYearSlider').addEventListener('input',e=>{
+  mapYear=+e.target.value;document.getElementById('mapYearLbl').textContent=mapYear;renderMap();
+});
+document.getElementById('playBtn').addEventListener('click',()=>{
+  if(playInterval)stopPlay();else startPlay();
 });
 
 loadData();
