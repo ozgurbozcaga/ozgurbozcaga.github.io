@@ -7,667 +7,476 @@
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d0f14;
-    --surface: #13161d;
-    --surface2: #1a1e28;
-    --border: #252a38;
-    --accent: #00e5a0;
-    --accent2: #4f8ef7;
-    --warn: #f7c948;
-    --text: #e8eaf0;
-    --text-dim: #7a8099;
-    --text-muted: #3d4258;
-    --font-mono: 'IBM Plex Mono', monospace;
-    --font-sans: 'IBM Plex Sans', sans-serif;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 13px;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── HEADER ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: baseline; gap: 10px; }
-  .logo { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: -0.5px; }
-  .logo span { color: var(--text-dim); }
-  .header-meta { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
-  .header-right { font-size: 11px; color: var(--text-dim); }
-  .header-right a { color: var(--accent2); text-decoration: none; }
-  .header-right a:hover { text-decoration: underline; }
-
-  /* ── LAYOUT ── */
-  .app { display: grid; grid-template-columns: 280px 1fr; height: calc(100vh - 49px); }
-
-  /* ── SIDEBAR ── */
-  aside {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  aside::-webkit-scrollbar { width: 4px; }
-  aside::-webkit-scrollbar-track { background: transparent; }
-  aside::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .panel {
-    border-bottom: 1px solid var(--border);
-    padding: 14px 16px;
-  }
-  .panel-title {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 10px;
-  }
-
-  /* Country search */
-  .search-wrap { position: relative; }
-  .search-wrap input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 13px;
-    padding: 7px 10px 7px 30px;
-    outline: none;
-    transition: border-color .15s;
-  }
-  .search-wrap input:focus { border-color: var(--accent); }
-  .search-wrap::before {
-    content: '⌕';
-    position: absolute;
-    left: 9px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 16px;
-    pointer-events: none;
-  }
-
-  .country-list {
-    margin-top: 8px;
-    max-height: 180px;
-    overflow-y: auto;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--surface2);
-  }
-  .country-list::-webkit-scrollbar { width: 3px; }
-  .country-list::-webkit-scrollbar-thumb { background: var(--border); }
-
-  .country-item {
-    padding: 6px 10px;
-    cursor: pointer;
-    font-size: 12px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: background .1s;
-  }
-  .country-item:last-child { border-bottom: none; }
-  .country-item:hover { background: var(--border); }
-  .country-item.selected { background: rgba(0,229,160,.08); color: var(--accent); }
-  .country-badge {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    padding: 2px 5px;
-    border-radius: 2px;
-    background: var(--border);
-    color: var(--text-dim);
-  }
-  .country-badge.annex-i { background: rgba(79,142,247,.15); color: var(--accent2); }
-
-  /* Year range */
-  .year-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .year-label { font-family: var(--font-mono); font-size: 11px; color: var(--accent); min-width: 36px; }
-  .year-display { font-family: var(--font-mono); font-size: 11px; color: var(--accent); text-align: right; min-width: 36px; }
-
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    outline: none;
-  }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    transition: transform .1s;
-  }
-  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-  /* Chart type */
-  .btn-group { display: flex; gap: 4px; flex-wrap: wrap; }
-  .btn {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: .5px;
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    background: var(--surface2);
-    color: var(--text-dim);
-    cursor: pointer;
-    transition: all .15s;
-    text-transform: uppercase;
-  }
-  .btn:hover { border-color: var(--accent); color: var(--text); }
-  .btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
-  .btn.active-blue { background: var(--accent2); color: #fff; border-color: var(--accent2); font-weight: 600; }
-
-  /* Sectors */
-  .sector-controls { display: flex; gap: 6px; margin-bottom: 8px; }
-  .sector-controls .btn { padding: 3px 8px; font-size: 9px; }
-  .sector-list { display: flex; flex-direction: column; gap: 3px; max-height: 240px; overflow-y: auto; padding-right: 4px; }
-  .sector-list::-webkit-scrollbar { width: 3px; }
-  .sector-list::-webkit-scrollbar-thumb { background: var(--border); }
-
-  .sector-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 3px;
-    transition: background .1s;
-  }
-  .sector-item:hover { background: var(--surface2); }
-  .sector-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  .sector-label { font-size: 11px; color: var(--text); line-height: 1.3; }
-  .sector-item.disabled .sector-label { color: var(--text-muted); text-decoration: line-through; }
-  .sector-checkbox {
-    width: 14px; height: 14px; border-radius: 2px;
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px;
-    transition: all .1s;
-  }
-  .sector-item.checked .sector-checkbox {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--bg);
-  }
-  .sector-item.checked .sector-checkbox::after { content: '✓'; }
-
-  /* Unit toggle */
-  .unit-note { font-size: 10px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
-
-  /* ── MAIN ── */
-  main {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: var(--bg);
-  }
-
-  .chart-header {
-    padding: 14px 20px 10px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .chart-title { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.2; }
-  .chart-subtitle { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 3px; }
-  .stats { display: flex; gap: 20px; }
-  .stat { text-align: right; }
-  .stat-val { font-family: var(--font-mono); font-size: 18px; font-weight: 600; color: var(--accent); }
-  .stat-val.blue { color: var(--accent2); }
-  .stat-lbl { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
-
-  #chart { flex: 1; min-height: 0; }
-
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    flex-direction: column;
-    gap: 12px;
-    color: var(--text-dim);
-  }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .no-data {
-    display: flex; align-items: center; justify-content: center;
-    height: 100%; flex-direction: column; gap: 10px;
-    color: var(--text-muted);
-  }
-  .no-data-icon { font-size: 40px; opacity: .3; }
-
-  /* Responsive */
-  @media (max-width: 900px) {
-    .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: auto; }
-    aside { max-height: 50vh; }
-    main { height: 60vh; }
-  }
+:root{--bg:#0d0f14;--surface:#13161d;--surface2:#1a1e28;--border:#252a38;--accent:#00e5a0;--accent2:#4f8ef7;--warn:#f7c948;--text:#e8eaf0;--text-dim:#7a8099;--text-muted:#3d4258;--font-mono:'IBM Plex Mono',monospace;--font-sans:'IBM Plex Sans',sans-serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:13px;min-height:100vh;overflow-x:hidden;}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100;}
+.logo{font-family:var(--font-mono);font-size:18px;font-weight:600;color:var(--accent);letter-spacing:-.5px;}
+.logo span{color:var(--text-dim);}
+.header-meta{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-left:10px;}
+.header-right{font-size:11px;color:var(--text-dim);}
+.header-right a{color:var(--accent2);text-decoration:none;}
+.header-left{display:flex;align-items:baseline;}
+.app{display:grid;grid-template-columns:285px 1fr;height:calc(100vh - 49px);}
+aside{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+aside::-webkit-scrollbar{width:4px;}
+aside::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.panel{border-bottom:1px solid var(--border);padding:12px 14px;}
+.panel-title{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+.search-wrap{position:relative;}
+.search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--font-sans);font-size:13px;padding:7px 10px 7px 28px;outline:none;transition:border-color .15s;}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap::before{content:'⌕';position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:16px;pointer-events:none;}
+.country-list{margin-top:6px;max-height:170px;overflow-y:auto;border:1px solid var(--border);border-radius:4px;background:var(--surface2);}
+.country-list::-webkit-scrollbar{width:3px;}
+.country-list::-webkit-scrollbar-thumb{background:var(--border);}
+.country-item{padding:5px 9px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:background .1s;}
+.country-item:last-child{border-bottom:none;}
+.country-item:hover{background:var(--border);}
+.country-item.selected{background:rgba(0,229,160,.08);color:var(--accent);}
+.country-badge{font-family:var(--font-mono);font-size:9px;padding:2px 5px;border-radius:2px;background:var(--border);color:var(--text-dim);}
+.country-badge.annex-i{background:rgba(79,142,247,.15);color:var(--accent2);}
+.year-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.year-label{font-family:var(--font-mono);font-size:11px;color:var(--accent);min-width:36px;}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer;transition:transform .1s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+.btn-group{display:flex;gap:4px;flex-wrap:wrap;}
+.btn{font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;padding:4px 9px;border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text-dim);cursor:pointer;transition:all .15s;text-transform:uppercase;}
+.btn:hover{border-color:var(--accent);color:var(--text);}
+.btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:600;}
+.btn.warn-btn{border-color:rgba(247,201,72,.4);color:var(--warn);}
+.btn.warn-btn.active{background:var(--warn);color:var(--bg);border-color:var(--warn);}
+.unit-note{font-size:10px;color:var(--text-muted);margin-top:5px;line-height:1.5;}
+.sector-panel{flex:1;display:flex;flex-direction:column;min-height:0;border-bottom:none;padding:10px 0 0;}
+.sector-panel .panel-title{padding:0 14px;margin-bottom:6px;}
+.sector-actions{display:flex;gap:4px;flex-wrap:wrap;padding:0 14px 8px;border-bottom:1px solid var(--border);}
+.sector-actions .btn{padding:3px 8px;font-size:9px;}
+.tree-scroll{flex:1;overflow-y:auto;padding:2px 0 8px;}
+.tree-scroll::-webkit-scrollbar{width:3px;}
+.tree-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+.tree-row{display:flex;align-items:center;gap:4px;padding:2px 6px 2px 0;cursor:default;border-radius:3px;transition:background .1s;min-height:22px;}
+.tree-row:hover{background:rgba(255,255,255,.03);}
+.exp-btn{width:14px;height:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--text-muted);cursor:pointer;border-radius:2px;transition:transform .15s,color .1s;user-select:none;}
+.exp-btn:hover{color:var(--accent);}
+.exp-btn.open{transform:rotate(90deg);}
+.exp-spacer{width:14px;flex-shrink:0;}
+.node-cb{width:12px;height:12px;border-radius:2px;border:1px solid var(--border);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;transition:all .1s;}
+.node-cb:hover{border-color:var(--accent);}
+.node-cb.cb-on{background:var(--accent);border-color:var(--accent);color:var(--bg);}
+.node-cb.cb-on::after{content:'✓';}
+.node-cb.cb-part{background:rgba(0,229,160,.2);border-color:var(--accent);}
+.node-cb.cb-part::after{content:'−';color:var(--accent);font-size:10px;line-height:1;}
+.node-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.node-label{font-size:11px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;user-select:none;line-height:1.3;}
+.node-label:hover{color:var(--accent);}
+.node-label code{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);margin-right:3px;}
+.node-label.is-parent{font-weight:500;}
+.agg-badge{font-family:var(--font-mono);font-size:8px;padding:1px 4px;border-radius:2px;background:rgba(0,229,160,.1);color:var(--accent);flex-shrink:0;letter-spacing:.5px;}
+.chart-header{padding:12px 20px 10px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border);flex-shrink:0;}
+.chart-title{font-size:16px;font-weight:500;color:var(--text);line-height:1.2;}
+.chart-subtitle{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:3px;}
+.stats{display:flex;gap:18px;}
+.stat{text-align:right;}
+.stat-val{font-family:var(--font-mono);font-size:17px;font-weight:600;color:var(--accent);}
+.stat-val.blue{color:var(--accent2);}
+.stat-lbl{font-size:10px;color:var(--text-muted);margin-top:1px;}
+#chart{flex:1;min-height:0;}
+.loading,.no-data{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:var(--text-dim);}
+.spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.no-data-icon{font-size:40px;opacity:.3;}
 </style>
 </head>
 <body>
-
 <header>
   <div class="header-left">
     <div class="logo">EDGAR<span>.GHG</span></div>
     <div class="header-meta">Emissions Explorer · 1970–2024</div>
   </div>
   <div class="header-right">
-    Data: <a href="https://edgar.jrc.ec.europa.eu/dataset_ghg2025" target="_blank">JRC EDGAR v2025</a> &nbsp;·&nbsp;
-    GWP-100 AR5 · Units: Gg CO₂eq
+    Data: <a href="https://edgar.jrc.ec.europa.eu/dataset_ghg2025" target="_blank">JRC EDGAR v2025</a>
+    &nbsp;·&nbsp; GWP-100 AR5 · Fossil emissions · Gg CO₂eq
   </div>
 </header>
-
 <div class="app">
-  <aside>
-
-    <!-- COUNTRY -->
-    <div class="panel">
-      <div class="panel-title">Country</div>
-      <div class="search-wrap">
-        <input id="countrySearch" type="text" placeholder="Search country…" autocomplete="off">
-      </div>
-      <div class="country-list" id="countryList"></div>
+<aside>
+  <div class="panel">
+    <div class="panel-title">Country</div>
+    <div class="search-wrap"><input id="countrySearch" type="text" placeholder="Search country…" autocomplete="off"></div>
+    <div class="country-list" id="countryList"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Year Range</div>
+    <div class="year-row"><div class="year-label" id="yearFromLbl">1970</div><input type="range" id="yearFrom" min="1970" max="2024" value="1970"></div>
+    <div class="year-row"><div class="year-label" id="yearToLbl">2024</div><input type="range" id="yearTo" min="1970" max="2024" value="2024"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Chart Type</div>
+    <div class="btn-group" id="chartType">
+      <button class="btn active" data-type="bar_stacked">Stacked</button>
+      <button class="btn" data-type="bar_grouped">Grouped</button>
+      <button class="btn" data-type="line">Lines</button>
+      <button class="btn" data-type="area">Area</button>
     </div>
-
-    <!-- YEAR RANGE -->
-    <div class="panel">
-      <div class="panel-title">Year Range</div>
-      <div class="year-row">
-        <div class="year-label" id="yearFromLbl">1970</div>
-        <input type="range" id="yearFrom" min="1970" max="2024" value="1970" step="1">
-      </div>
-      <div class="year-row">
-        <div class="year-label" id="yearToLbl">2024</div>
-        <input type="range" id="yearTo" min="1970" max="2024" value="2024" step="1">
-      </div>
+    <div class="btn-group" style="margin-top:6px;" id="unitToggle">
+      <button class="btn active" data-unit="Gg">Gg CO₂eq</button>
+      <button class="btn" data-unit="Mt">Mt CO₂eq</button>
     </div>
-
-    <!-- CHART TYPE -->
-    <div class="panel">
-      <div class="panel-title">Chart Type</div>
-      <div class="btn-group" id="chartType">
-        <button class="btn active" data-type="bar_stacked">Stacked Bar</button>
-        <button class="btn" data-type="bar_grouped">Grouped</button>
-        <button class="btn" data-type="line">Lines</button>
-        <button class="btn" data-type="area">Area</button>
-      </div>
+    <div class="unit-note">Fossil only · AR5 GWP-100</div>
+  </div>
+  <div class="panel sector-panel">
+    <div class="panel-title">Sectors</div>
+    <div class="sector-actions">
+      <button class="btn active" id="btn5sec" title="Collapse all to 5 main sector aggregates">5 Sectors</button>
+      <button class="btn warn-btn" id="btnSingle" title="Show single total">Single Total</button>
+      <button class="btn" id="btnExpAll" title="Expand all — full sector detail">All Detail</button>
+      <button class="btn" id="btnNone" title="Deselect everything">Clear</button>
     </div>
-
-    <!-- UNIT -->
-    <div class="panel">
-      <div class="panel-title">Unit</div>
-      <div class="btn-group" id="unitToggle">
-        <button class="btn active" data-unit="Gg">Gg CO₂eq</button>
-        <button class="btn" data-unit="Mt">Mt CO₂eq</button>
-      </div>
-      <div class="unit-note">1 Mt = 1,000 Gg<br>Fossil emissions only · AR5 GWP-100</div>
+    <div class="tree-scroll" id="sectorTree"></div>
+  </div>
+</aside>
+<main>
+  <div class="chart-header">
+    <div>
+      <div class="chart-title" id="chartTitle">Select a country to begin</div>
+      <div class="chart-subtitle" id="chartSubtitle">GHG Emissions by Sector · IPCC 2006</div>
     </div>
-
-    <!-- SECTORS -->
-    <div class="panel" style="flex:1">
-      <div class="panel-title">Sectors</div>
-      <div class="sector-controls">
-        <button class="btn" id="selectAll">All</button>
-        <button class="btn" id="selectNone">None</button>
-      </div>
-      <div class="sector-list" id="sectorList"></div>
+    <div class="stats" id="statsBox" style="display:none">
+      <div class="stat"><div class="stat-val" id="statLatest">—</div><div class="stat-lbl" id="statLatestLbl">2024 Total</div></div>
+      <div class="stat"><div class="stat-val blue" id="statPeak">—</div><div class="stat-lbl">Peak Year</div></div>
     </div>
-
-  </aside>
-
-  <main>
-    <div class="chart-header">
-      <div>
-        <div class="chart-title" id="chartTitle">Select a country to begin</div>
-        <div class="chart-subtitle" id="chartSubtitle">GHG Emissions by Sector</div>
-      </div>
-      <div class="stats" id="statsBox" style="display:none">
-        <div class="stat">
-          <div class="stat-val" id="statLatest">—</div>
-          <div class="stat-lbl" id="statLatestLbl">2024 Total</div>
-        </div>
-        <div class="stat">
-          <div class="stat-val blue" id="statPeak">—</div>
-          <div class="stat-lbl">Peak Year</div>
-        </div>
-      </div>
-    </div>
-    <div id="chart">
-      <div class="no-data">
-        <div class="no-data-icon">◈</div>
-        <div>Search and select a country from the sidebar</div>
-      </div>
-    </div>
-  </main>
+  </div>
+  <div id="chart"><div class="no-data"><div class="no-data-icon">◈</div><div>Search and select a country from the sidebar</div></div></div>
+</main>
 </div>
 
 <script>
-// ── SECTOR COLOR PALETTE ──
-const SECTOR_COLORS = {
-  'Main Activity Electricity and Heat Production': '#f7c948',
-  'Manufacturing Industries and Construction': '#f78c48',
-  'Road Transportation no resuspension': '#4f8ef7',
-  'Residential and other sectors': '#e05a8a',
-  'Oil and Natural Gas': '#7c4ff7',
-  'Non-Specified': '#9aa0b4',
-  'Civil Aviation': '#4fccf7',
-  'Water-borne Navigation': '#4ff7c4',
-  'Other Transportation': '#7ff74f',
-  'Railways': '#48a0f7',
-  'Petroleum Refining - Manufacture of Solid Fuels and Other Energy Industries': '#c4a04f',
-  'Solid Fuels': '#a04f4f',
-  'Cement production': '#b0b0b0',
-  'Chemical Industry': '#e080d0',
-  'Metal Industry': '#a0d0e0',
-  'Glass Production': '#80d0a0',
-  'Other Process Uses of Carbonates': '#c0c080',
-  'Non-Energy Products from Fuels and Solvent Use': '#d0a080',
-  'Other Product Manufacture and Use': '#c0a0d0',
-  'Product Uses as Substitutes for Ozone Depleting Substances': '#90c0f0',
-  'Enteric Fermentation': '#50c050',
-  'Manure Management': '#80a050',
-  'Direct N2O Emissions from managed soils': '#a0c040',
-  'Indirect N2O Emissions from managed soils': '#c0d060',
-  'Indirect N2O Emissions from manure management': '#b0c870',
-  'Rice cultivations': '#70b050',
-  'Liming': '#90b870',
-  'Urea application': '#a8c880',
-  'Solid Waste Disposal': '#888888',
-  'Wastewater Treatment and Discharge': '#60a8a8',
-  'Biological Treatment of Solid Waste': '#78b878',
-  'Incineration and Open Burning of Waste': '#e07040',
-  'Other': '#707070',
-  'Indirect N2O emissions from the atmospheric deposition of nitrogen in NOx and NH3': '#98c8a0',
-  'Electronics Industry': '#78a8e8',
-  'Fossil fuel fires': '#e84848',
-  'Lime production': '#d0b090',
+// ── HIERARCHY ──
+const TREE = [
+  {id:'1',name:'Energy',children:[
+    {id:'1.A',name:'Fuel Combustion Activities',children:[
+      {id:'1.A.1',name:'Energy Industries',children:[
+        {id:'1.A.1.a',name:'Main Activity Electricity and Heat Production'},
+        {id:'1.A.1.bc',name:'Petroleum Refining & Manufacture of Solid Fuels'},
+      ]},
+      {id:'1.A.2',name:'Manufacturing Industries and Construction'},
+      {id:'1.A.3',name:'Transport',children:[
+        {id:'1.A.3.a',name:'Civil Aviation'},
+        {id:'1.A.3.b_noRES',name:'Road Transportation'},
+        {id:'1.A.3.c',name:'Railways'},
+        {id:'1.A.3.d',name:'Water-borne Navigation'},
+        {id:'1.A.3.e',name:'Other Transportation'},
+      ]},
+      {id:'1.A.4',name:'Residential and Other Sectors'},
+      {id:'1.A.5',name:'Non-Specified'},
+    ]},
+    {id:'1.B',name:'Fugitive Emissions from Fuels',children:[
+      {id:'1.B.1',name:'Solid Fuels'},
+      {id:'1.B.2',name:'Oil and Natural Gas'},
+    ]},
+  ]},
+  {id:'2',name:'Industrial Processes and Product Use (IPPU)',children:[
+    {id:'2.A',name:'Mineral Industry',children:[
+      {id:'2.A.1',name:'Cement Production'},
+      {id:'2.A.2',name:'Lime Production'},
+      {id:'2.A.3',name:'Glass Production'},
+      {id:'2.A.4',name:'Other Process Uses of Carbonates'},
+    ]},
+    {id:'2.B',name:'Chemical Industry'},
+    {id:'2.C',name:'Metal Industry'},
+    {id:'2.D',name:'Non-Energy Products from Fuels and Solvent Use'},
+    {id:'2.E',name:'Electronics Industry'},
+    {id:'2.F',name:'Product Uses as Substitutes for ODS'},
+    {id:'2.G',name:'Other Product Manufacture and Use'},
+  ]},
+  {id:'3',name:'Agriculture',children:[
+    {id:'3.A',name:'Livestock',children:[
+      {id:'3.A.1',name:'Enteric Fermentation'},
+      {id:'3.A.2',name:'Manure Management'},
+    ]},
+    {id:'3.C',name:'Other Agriculture',children:[
+      {id:'3.C.2',name:'Liming'},
+      {id:'3.C.3',name:'Urea Application'},
+      {id:'3.C.4',name:'Direct N\u2082O Emissions from Managed Soils'},
+      {id:'3.C.5',name:'Indirect N\u2082O Emissions from Managed Soils'},
+      {id:'3.C.6',name:'Indirect N\u2082O Emissions from Manure Management'},
+      {id:'3.C.7',name:'Rice Cultivations'},
+    ]},
+  ]},
+  {id:'4',name:'Waste',children:[
+    {id:'4.A',name:'Solid Waste Disposal'},
+    {id:'4.B',name:'Biological Treatment of Solid Waste'},
+    {id:'4.C',name:'Incineration and Open Burning of Waste'},
+    {id:'4.D',name:'Wastewater Treatment and Discharge'},
+    {id:'4.E',name:'Other Waste'},
+  ]},
+  {id:'5',name:'Other',children:[
+    {id:'5.A',name:'Indirect N\u2082O from Atmospheric Deposition'},
+    {id:'5.B',name:'Fossil Fuel Fires'},
+  ]},
+];
+
+// ── COLORS ──
+const LEAF_COLORS = {
+  '1.A.1.a':'#FFB800','1.A.1.bc':'#E68A00','1.A.2':'#FF6B35',
+  '1.A.3.a':'#64B5F6','1.A.3.b_noRES':'#1E88E5','1.A.3.c':'#7B68EE',
+  '1.A.3.d':'#26C6DA','1.A.3.e':'#80DEEA',
+  '1.A.4':'#EF5350','1.A.5':'#A1887F','1.B.1':'#6D4C41','1.B.2':'#8E24AA',
+  '2.A.1':'#B0BEC5','2.A.2':'#CFD8DC','2.A.3':'#80CBC4','2.A.4':'#A5D6A7',
+  '2.B':'#CE93D8','2.C':'#90CAF9','2.D':'#FFCC80',
+  '2.E':'#81D4FA','2.F':'#F48FB1','2.G':'#B39DDB',
+  '3.A.1':'#2E7D32','3.A.2':'#558B2F',
+  '3.C.2':'#9CCC65','3.C.3':'#C5E1A5','3.C.4':'#7CB342',
+  '3.C.5':'#AED581','3.C.6':'#DCE775','3.C.7':'#F9A825',
+  '4.A':'#757575','4.B':'#4CAF50','4.C':'#FF7043','4.D':'#26A69A','4.E':'#9E9E9E',
+  '5.A':'#00BCD4','5.B':'#F44336',
+};
+const PARENT_COLORS = {
+  '1':'#FFB800','1.A':'#FF8C00','1.A.1':'#FFD54F','1.A.3':'#42A5F5',
+  '1.B':'#8E24AA',
+  '2':'#4f8ef7','2.A':'#B0BEC5',
+  '3':'#388E3C','3.A':'#2E7D32','3.C':'#7CB342',
+  '4':'#78909C',
+  '5':'#F44336',
 };
 
 // ── STATE ──
-let DATA = null;
-let selectedCountry = null;
-let selectedSectors = new Set();
-let allSectors = [];
-let yearFrom = 1970, yearTo = 2024;
-let chartType = 'bar_stacked';
-let unit = 'Gg';
+let DATA=null, selectedCountry=null;
+let yearFrom=1970, yearTo=2024;
+let chartType='bar_stacked', unit='Gg';
+let leafChecked={}, nodeExpanded={}, singleTotal=false;
 
-// ── LOAD DATA ──
-async function loadData() {
-  document.getElementById('chart').innerHTML = `
-    <div class="loading"><div class="spinner"></div><div>Loading EDGAR data…</div></div>`;
-  try {
-    const r = await fetch('edgar_data.json');
-    DATA = await r.json();
-    allSectors = DATA.sectors;
-    selectedSectors = new Set(allSectors);
-    initUI();
-     document.getElementById('chart').innerHTML = `
-      <div class="no-data">
-        <div class="no-data-icon">◈</div>
-        <div>Search and select a country from the sidebar</div>
-      </div>`;
-  } catch(e) {
-    document.getElementById('chart').innerHTML =
-      `<div class="no-data"><div class="no-data-icon">⚠</div><div>Failed to load data: ${e.message}</div></div>`;
+// ── TREE UTILS ──
+function getAllLeaves(node){
+  if(!node.children) return [node.id];
+  return node.children.flatMap(c=>getAllLeaves(c));
+}
+function allLeavesInTree(){ return TREE.flatMap(n=>getAllLeaves(n)); }
+function getParentCbState(node){
+  const leaves=getAllLeaves(node);
+  const n=leaves.filter(l=>leafChecked[l]).length;
+  return n===0?'off':n===leaves.length?'on':'part';
+}
+function setAllLeaves(nodes,val){ for(const n of nodes){ if(!n.children) leafChecked[n.id]=val; else setAllLeaves(n.children,val); } }
+function setAllExpanded(nodes,val){ for(const n of nodes){ if(n.children){ nodeExpanded[n.id]=val; setAllExpanded(n.children,val); } } }
+function findNode(id,nodes){ for(const n of nodes){ if(n.id===id) return n; if(n.children){const f=findNode(id,n.children);if(f)return f;} } return null; }
+
+function initState(){ setAllLeaves(TREE,true); setAllExpanded(TREE,false); }
+
+// ── TREE HTML ──
+function buildTreeHTML(nodes,depth){ return nodes.map(n=>renderNodeHTML(n,depth)).join(''); }
+
+function renderNodeHTML(node,depth){
+  const isLeaf=!node.children;
+  const isExpanded=nodeExpanded[node.id];
+  const indent=depth*14+6;
+  const expBtn=isLeaf
+    ?`<span class="exp-spacer"></span>`
+    :`<span class="exp-btn${isExpanded?' open':''}" data-eid="${node.id}">&#9658;</span>`;
+  const cbState=isLeaf?(leafChecked[node.id]?'cb-on':''):{on:'cb-on',part:'cb-part',off:''}[getParentCbState(node)];
+  const cb=`<span class="node-cb ${cbState}" data-cid="${node.id}" data-leaf="${isLeaf?'1':'0'}"></span>`;
+  const color=isLeaf?(LEAF_COLORS[node.id]||'#888'):(PARENT_COLORS[node.id]||'#666');
+  const dot=`<span class="node-dot" style="background:${color}"></span>`;
+  const showAgg=!isLeaf&&!isExpanded&&getParentCbState(node)!=='off';
+  const badge=showAgg?`<span class="agg-badge">&Sigma;</span>`:'';
+  const parentCls=isLeaf?'':' is-parent';
+  const label=`<span class="node-label${parentCls}" data-cid="${node.id}" data-leaf="${isLeaf?'1':'0'}" title="${node.name}"><code>${node.id}</code>${node.name}</span>`;
+  let html=`<div class="tree-row" style="padding-left:${indent}px">${expBtn}${cb}${dot}${label}${badge}</div>`;
+  if(!isLeaf&&isExpanded) html+=buildTreeHTML(node.children,depth+1);
+  return html;
+}
+
+function refreshTree(){ document.getElementById('sectorTree').innerHTML=buildTreeHTML(TREE,0); }
+
+// ── CHART ──
+function getFactor(){ return unit==='Mt'?1/1000:1; }
+function getUnitLabel(){ return unit==='Mt'?'Mt CO\u2082eq':'Gg CO\u2082eq'; }
+
+function sumLeaves(leafIds,cdata,fi,len){
+  const s=new Array(len).fill(0);
+  for(const id of leafIds){ if(cdata[id]) for(let i=0;i<len;i++) s[i]+=cdata[id][fi+i]||0; }
+  return s;
+}
+
+function collectTraces(node,traces,cdata,fi,len,factor){
+  const isLeaf=!node.children;
+  if(isLeaf){
+    if(!leafChecked[node.id]||!cdata[node.id]) return;
+    traces.push({name:node.name,color:LEAF_COLORS[node.id]||'#888',vals:cdata[node.id].slice(fi,fi+len).map(v=>v*factor)});
+    return;
+  }
+  const checked=getAllLeaves(node).filter(l=>leafChecked[l]);
+  if(!checked.length) return;
+  if(!nodeExpanded[node.id]){
+    traces.push({name:node.name,color:PARENT_COLORS[node.id]||'#888',vals:sumLeaves(checked,cdata,fi,len).map(v=>v*factor)});
+  } else {
+    for(const child of node.children) collectTraces(child,traces,cdata,fi,len,factor);
   }
 }
 
-function initUI() {
-  buildCountryList('');
-  buildSectorList();
-
-  document.getElementById('countrySearch').addEventListener('input', e => {
-    buildCountryList(e.target.value.toLowerCase());
+function renderChart(){
+  if(!DATA||!selectedCountry) return;
+  const cdata=DATA.data[selectedCountry]; if(!cdata) return;
+  const years=DATA.years;
+  const fi=years.indexOf(yearFrom), ti=years.indexOf(yearTo), len=ti-fi+1;
+  const filteredYears=years.slice(fi,ti+1);
+  const factor=getFactor();
+  let traceList=[];
+  if(singleTotal){
+    const allLeaves=allLeavesInTree().filter(l=>leafChecked[l]);
+    if(allLeaves.length) traceList=[{name:'Total Emissions',color:'#00e5a0',vals:sumLeaves(allLeaves,cdata,fi,len).map(v=>v*factor)}];
+  } else {
+    for(const root of TREE) collectTraces(root,traceList,cdata,fi,len,factor);
+  }
+  if(!traceList.length){
+    Plotly.react('chart',[],{paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)'},{responsive:true});
+    return;
+  }
+  const traces=traceList.map(t=>{
+    const base={x:filteredYears,y:t.vals,name:t.name,hovertemplate:`<b>${t.name}</b><br>%{x}: %{y:,.1f} ${getUnitLabel()}<extra></extra>`};
+    if(chartType==='line') return {...base,type:'scatter',mode:'lines',line:{color:t.color,width:2}};
+    if(chartType==='area') return {...base,type:'scatter',mode:'lines',fill:'tonexty',line:{color:t.color,width:1},fillcolor:t.color+'88'};
+    return {...base,type:'bar',marker:{color:t.color}};
   });
-
-  document.getElementById('yearFrom').addEventListener('input', e => {
-    yearFrom = +e.target.value;
-    if (yearFrom > yearTo) { yearTo = yearFrom; document.getElementById('yearTo').value = yearTo; }
-    document.getElementById('yearFromLbl').textContent = yearFrom;
-    document.getElementById('yearToLbl').textContent = yearTo;
-    renderChart();
+  const layout={
+    barmode:chartType==='bar_grouped'?'group':'stack',
+    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+    font:{family:'IBM Plex Sans',color:'#7a8099',size:11},
+    margin:{t:10,r:20,b:50,l:70},
+    xaxis:{gridcolor:'#252a38',linecolor:'#252a38',tickcolor:'#252a38',color:'#7a8099',
+      dtick:chartType.startsWith('bar')&&(yearTo-yearFrom)>30?5:null},
+    yaxis:{gridcolor:'#252a38',linecolor:'#252a38',tickcolor:'#252a38',color:'#7a8099',
+      title:{text:getUnitLabel(),font:{size:11}},tickformat:',.0f'},
+    showlegend:false,hovermode:'x unified',
+    hoverlabel:{bgcolor:'#1a1e28',bordercolor:'#252a38',font:{family:'IBM Plex Mono',size:11,color:'#e8eaf0'}}
+  };
+  Plotly.react('chart',traces,layout,{responsive:true,displayModeBar:true,
+    modeBarButtonsToRemove:['select2d','lasso2d','autoScale2d'],displaylogo:false,
+    toImageButtonOptions:{filename:`EDGAR_${selectedCountry}_${yearFrom}_${yearTo}`}});
+  const annex=(DATA.annex[selectedCountry]||'').replace('_',' ');
+  document.getElementById('chartTitle').textContent=selectedCountry;
+  document.getElementById('chartSubtitle').textContent=`${annex} · GHG Fossil Emissions · ${yearFrom}–${yearTo}`;
+  document.getElementById('statsBox').style.display='flex';
+  let latestTotal=0,peakTotal=0,peakYear=filteredYears[0];
+  filteredYears.forEach((yr,i)=>{
+    const sum=traces.reduce((a,t)=>a+(t.y[i]||0),0);
+    if(i===filteredYears.length-1) latestTotal=sum;
+    if(sum>peakTotal){peakTotal=sum;peakYear=yr;}
   });
-
-  document.getElementById('yearTo').addEventListener('input', e => {
-    yearTo = +e.target.value;
-    if (yearTo < yearFrom) { yearFrom = yearTo; document.getElementById('yearFrom').value = yearFrom; }
-    document.getElementById('yearFromLbl').textContent = yearFrom;
-    document.getElementById('yearToLbl').textContent = yearTo;
-    renderChart();
-  });
-
-  document.getElementById('chartType').addEventListener('click', e => {
-    if (!e.target.dataset.type) return;
-    chartType = e.target.dataset.type;
-    document.querySelectorAll('#chartType .btn').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    renderChart();
-  });
-
-  document.getElementById('unitToggle').addEventListener('click', e => {
-    if (!e.target.dataset.unit) return;
-    unit = e.target.dataset.unit;
-    document.querySelectorAll('#unitToggle .btn').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    renderChart();
-  });
-
-  document.getElementById('selectAll').addEventListener('click', () => {
-    selectedSectors = new Set(allSectors);
-    buildSectorList();
-    renderChart();
-  });
-
-  document.getElementById('selectNone').addEventListener('click', () => {
-    selectedSectors.clear();
-    buildSectorList();
-    renderChart();
-  });
+  const fmt=n=>n>=1000?(n/1000).toFixed(1)+'k':n.toFixed(1);
+  document.getElementById('statLatest').textContent=fmt(latestTotal);
+  document.getElementById('statLatestLbl').textContent=`${filteredYears[filteredYears.length-1]} Total`;
+  document.getElementById('statPeak').textContent=peakYear;
 }
 
-function buildCountryList(filter) {
-  const list = document.getElementById('countryList');
-  if (!DATA) return;
-  const countries = DATA.countries.filter(c =>
-    !filter || c.toLowerCase().includes(filter)
-  );
-  list.innerHTML = countries.slice(0,80).map(c => {
-    const annex = DATA.annex[c] || '';
-    const cls = annex === 'Annex_I' ? 'annex-i' : '';
-    const badge = annex === 'Annex_I' ? 'Annex I' : annex === 'Non-Annex_I' ? 'Non-AI' : annex;
-    const sel = c === selectedCountry ? 'selected' : '';
-    return `<div class="country-item ${sel}" data-c="${c}">
-      <span>${c}</span>
-      <span class="country-badge ${cls}">${badge}</span>
-    </div>`;
+// ── COUNTRY LIST ──
+function buildCountryList(filter){
+  if(!DATA) return;
+  const list=document.getElementById('countryList');
+  const matches=DATA.countries.filter(c=>!filter||c.toLowerCase().includes(filter));
+  list.innerHTML=matches.slice(0,80).map(c=>{
+    const annex=DATA.annex[c]||'';
+    const badge=annex==='Annex_I'?'Annex I':annex==='Non-Annex_I'?'Non-AI':annex;
+    const cls=annex==='Annex_I'?'annex-i':'';
+    const sel=c===selectedCountry?'selected':'';
+    return `<div class="country-item ${sel}" data-c="${c}"><span>${c}</span><span class="country-badge ${cls}">${badge}</span></div>`;
   }).join('');
-
-  list.querySelectorAll('.country-item').forEach(el => {
-    el.addEventListener('click', () => {
-      selectedCountry = el.dataset.c;
-      document.querySelectorAll('.country-item').forEach(x => x.classList.remove('selected'));
+  list.querySelectorAll('.country-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      selectedCountry=el.dataset.c;
+      document.querySelectorAll('.country-item').forEach(x=>x.classList.remove('selected'));
       el.classList.add('selected');
       renderChart();
     });
   });
 }
 
-function buildSectorList() {
-  const list = document.getElementById('sectorList');
-  list.innerHTML = allSectors.map(s => {
-    const checked = selectedSectors.has(s) ? 'checked' : '';
-    const color = SECTOR_COLORS[s] || '#888';
-    return `<div class="sector-item ${checked}" data-s="${s}">
-      <div class="sector-checkbox"></div>
-      <div class="sector-dot" style="background:${color}"></div>
-      <div class="sector-label">${s}</div>
-    </div>`;
-  }).join('');
-
-  list.querySelectorAll('.sector-item').forEach(el => {
-    el.addEventListener('click', () => {
-      const s = el.dataset.s;
-      if (selectedSectors.has(s)) { selectedSectors.delete(s); el.classList.remove('checked'); }
-      else { selectedSectors.add(s); el.classList.add('checked'); }
-      renderChart();
-    });
+// ── TREE EVENTS ──
+function initTreeEvents(){
+  document.getElementById('sectorTree').addEventListener('click',e=>{
+    // Expand arrow
+    const expBtn=e.target.closest('[data-eid]');
+    if(expBtn&&expBtn.classList.contains('exp-btn')){
+      const id=expBtn.dataset.eid;
+      nodeExpanded[id]=!nodeExpanded[id];
+      refreshTree(); renderChart(); return;
+    }
+    // Checkbox / label
+    const target=e.target.closest('[data-cid]');
+    if(!target) return;
+    const id=target.dataset.cid;
+    const isLeaf=target.dataset.leaf==='1';
+    if(isLeaf){
+      leafChecked[id]=!leafChecked[id];
+    } else {
+      const node=findNode(id,TREE);
+      if(!node) return;
+      const newVal=getParentCbState(node)!=='on';
+      setAllLeaves([node],newVal);
+    }
+    refreshTree(); renderChart();
   });
 }
 
-function getFactor() { return unit === 'Mt' ? 1/1000 : 1; }
-function getUnitLabel() { return unit === 'Mt' ? 'Mt CO₂eq' : 'Gg CO₂eq'; }
-
-function renderChart() {
-  if (!DATA || !selectedCountry) return;
-  const cdata = DATA.data[selectedCountry];
-  if (!cdata) return;
-
-  const years = DATA.years;
-  const fi = years.indexOf(yearFrom);
-  const ti = years.indexOf(yearTo);
-  const filteredYears = years.slice(fi, ti + 1);
-  const factor = getFactor();
-
-  const activeSectors = allSectors.filter(s => selectedSectors.has(s) && cdata[s]);
-
-  // Build traces
-  const traces = activeSectors.map(s => {
-    const vals = cdata[s].slice(fi, ti + 1).map(v => v * factor);
-    const color = SECTOR_COLORS[s] || '#888';
-
-    if (chartType === 'bar_stacked' || chartType === 'bar_grouped') {
-      return {
-        x: filteredYears,
-        y: vals,
-        name: s,
-        type: 'bar',
-        marker: { color },
-        hovertemplate: `<b>${s}</b><br>%{x}: %{y:,.1f} ${getUnitLabel()}<extra></extra>`
-      };
-    } else if (chartType === 'line') {
-      return {
-        x: filteredYears,
-        y: vals,
-        name: s,
-        type: 'scatter',
-        mode: 'lines',
-        line: { color, width: 2 },
-        hovertemplate: `<b>${s}</b><br>%{x}: %{y:,.1f} ${getUnitLabel()}<extra></extra>`
-      };
-    } else { // area
-      return {
-        x: filteredYears,
-        y: vals,
-        name: s,
-        type: 'scatter',
-        mode: 'lines',
-        fill: 'tonexty',
-        line: { color, width: 1 },
-        fillcolor: color + '99',
-        hovertemplate: `<b>${s}</b><br>%{x}: %{y:,.1f} ${getUnitLabel()}<extra></extra>`
-      };
-    }
-  });
-
-  const layout = {
-    barmode: chartType === 'bar_grouped' ? 'group' : 'stack',
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { family: 'IBM Plex Sans', color: '#7a8099', size: 11 },
-    margin: { t: 10, r: 20, b: 50, l: 70 },
-    xaxis: {
-      gridcolor: '#252a38',
-      linecolor: '#252a38',
-      tickcolor: '#252a38',
-      color: '#7a8099',
-      dtick: chartType.startsWith('bar') && (yearTo - yearFrom) > 30 ? 5 : null,
-    },
-    yaxis: {
-      gridcolor: '#252a38',
-      linecolor: '#252a38',
-      tickcolor: '#252a38',
-      color: '#7a8099',
-      title: { text: getUnitLabel(), font: { size: 11 } },
-      tickformat: ',.0f',
-    },
-    showlegend: false,
-    hovermode: 'x unified',
-    hoverlabel: {
-      bgcolor: '#1a1e28',
-      bordercolor: '#252a38',
-      font: { family: 'IBM Plex Mono', size: 11, color: '#e8eaf0' }
-    }
-  };
-
-  Plotly.react('chart', traces, layout, {
-    responsive: true,
-    displayModeBar: true,
-    modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d'],
-    displaylogo: false,
-    toImageButtonOptions: { filename: `EDGAR_${selectedCountry}_${yearFrom}_${yearTo}` }
-  });
-
-  // Update header stats
-  const annex = DATA.annex[selectedCountry] || '';
-  document.getElementById('chartTitle').textContent = selectedCountry;
-  document.getElementById('chartSubtitle').textContent =
-    `${annex.replace('_',' ')} · GHG Fossil Emissions by Sector · ${yearFrom}–${yearTo}`;
-  document.getElementById('statsBox').style.display = 'flex';
-
-  // Compute totals
-  const latestIdx = filteredYears.length - 1;
-  let latestTotal = 0, peakTotal = 0, peakYear = filteredYears[0];
-  filteredYears.forEach((yr, i) => {
-    let sum = 0;
-    activeSectors.forEach(s => { if (cdata[s]) sum += (cdata[s].slice(fi, ti+1)[i] || 0) * factor; });
-    if (i === latestIdx) latestTotal = sum;
-    if (sum > peakTotal) { peakTotal = sum; peakYear = yr; }
-  });
-
-  const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'k' : n.toFixed(1);
-  document.getElementById('statLatest').textContent = fmt(latestTotal);
-  document.getElementById('statLatestLbl').textContent = `${filteredYears[latestIdx]} Total`;
-  document.getElementById('statPeak').textContent = peakYear;
+// ── LOAD ──
+async function loadData(){
+  document.getElementById('chart').innerHTML=`<div class="loading"><div class="spinner"></div><div>Loading EDGAR data…</div></div>`;
+  try{
+    DATA=await(await fetch('edgar_data.json')).json();
+    initState(); refreshTree(); initTreeEvents(); buildCountryList('');
+    document.getElementById('chart').innerHTML=`<div class="no-data"><div class="no-data-icon">&#9672;</div><div>Search and select a country from the sidebar</div></div>`;
+  }catch(e){
+    document.getElementById('chart').innerHTML=`<div class="no-data"><div class="no-data-icon">&#9888;</div><div>Failed to load data: ${e.message}</div></div>`;
+  }
 }
+
+// ── CONTROLS ──
+document.getElementById('countrySearch').addEventListener('input',e=>buildCountryList(e.target.value.toLowerCase()));
+document.getElementById('yearFrom').addEventListener('input',e=>{
+  yearFrom=+e.target.value; if(yearFrom>yearTo){yearTo=yearFrom;document.getElementById('yearTo').value=yearTo;}
+  document.getElementById('yearFromLbl').textContent=yearFrom; document.getElementById('yearToLbl').textContent=yearTo; renderChart();
+});
+document.getElementById('yearTo').addEventListener('input',e=>{
+  yearTo=+e.target.value; if(yearTo<yearFrom){yearFrom=yearTo;document.getElementById('yearFrom').value=yearFrom;}
+  document.getElementById('yearFromLbl').textContent=yearFrom; document.getElementById('yearToLbl').textContent=yearTo; renderChart();
+});
+document.getElementById('chartType').addEventListener('click',e=>{
+  if(!e.target.dataset.type) return;
+  chartType=e.target.dataset.type;
+  document.querySelectorAll('#chartType .btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active'); renderChart();
+});
+document.getElementById('unitToggle').addEventListener('click',e=>{
+  if(!e.target.dataset.unit) return;
+  unit=e.target.dataset.unit;
+  document.querySelectorAll('#unitToggle .btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active'); renderChart();
+});
+document.getElementById('btn5sec').addEventListener('click',()=>{
+  singleTotal=false;
+  document.getElementById('btnSingle').classList.remove('active');
+  setAllLeaves(TREE,true); setAllExpanded(TREE,false);
+  refreshTree(); renderChart();
+});
+document.getElementById('btnSingle').addEventListener('click',()=>{
+  singleTotal=!singleTotal;
+  document.getElementById('btnSingle').classList.toggle('active',singleTotal);
+  if(singleTotal) setAllLeaves(TREE,true);
+  refreshTree(); renderChart();
+});
+document.getElementById('btnExpAll').addEventListener('click',()=>{
+  singleTotal=false;
+  document.getElementById('btnSingle').classList.remove('active');
+  setAllLeaves(TREE,true); setAllExpanded(TREE,true);
+  refreshTree(); renderChart();
+});
+document.getElementById('btnNone').addEventListener('click',()=>{
+  singleTotal=false;
+  document.getElementById('btnSingle').classList.remove('active');
+  setAllLeaves(TREE,false); refreshTree(); renderChart();
+});
 
 loadData();
 </script>
