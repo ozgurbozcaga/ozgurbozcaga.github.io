@@ -136,7 +136,17 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .play-btn{font-family:var(--font-mono);font-size:11px;padding:4px 12px;border:1px solid var(--accent);border-radius:3px;background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .play-btn:hover{background:var(--accent);color:var(--bg);}
 .play-btn.playing{background:var(--accent);color:var(--bg);}
-.map-metric-info{font-size:10px;color:var(--text-muted);font-family:var(--font-mono);}
+.map-metric-info{display:none;} /* removed from toolbar */
+.map-overlay{position:absolute;top:12px;left:12px;z-index:10;background:rgba(13,15,20,.88);border:1px solid var(--border);border-radius:5px;padding:8px 12px;pointer-events:none;backdrop-filter:blur(4px);}
+.map-overlay-year{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);line-height:1;}
+.map-overlay-row{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:3px;letter-spacing:.3px;}
+.map-overlay-row span{color:var(--text);}
+#mapView{position:relative;}
+.year-input{font-family:var(--font-mono);font-size:12px;width:52px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent);padding:3px 6px;text-align:center;outline:none;}
+.year-input:focus{border-color:var(--accent);}
+/* hide spinners */
+.year-input::-webkit-inner-spin-button,.year-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.year-input[type=number]{-moz-appearance:textfield;}
 
 /* STATES */
 .loading,.no-data{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:var(--text-dim);}
@@ -251,11 +261,17 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <button class="btn" data-metric="share">Share of Global (%)</button>
       </div>
       <div class="map-year-wrap">
-        <div class="map-year-lbl" id="mapYearLbl">2024</div>
+        <input type="number" class="year-input" id="mapYearInput" min="1970" max="2024" value="2024">
         <input type="range" id="mapYearSlider" min="1970" max="2024" value="2024" style="flex:1;">
         <button class="play-btn" id="playBtn">&#9654; Play</button>
       </div>
-      <div class="map-metric-info" id="mapMetricInfo"></div>
+    </div>
+    <!-- Overlay info badge -->
+    <div class="map-overlay" id="mapOverlay">
+      <div class="map-overlay-year" id="mapOverlayYear">2024</div>
+      <div class="map-overlay-row" id="mapOverlayMetric"></div>
+      <div class="map-overlay-row" id="mapOverlaySectors"></div>
+      <div class="map-overlay-row" id="mapOverlaySource"></div>
     </div>
     <div id="map"></div>
   </div>
@@ -501,82 +517,102 @@ function getMapData(){
   if(!DATA)return null;
   const yi=DATA.years.indexOf(mapYear);
   if(yi<0)return null;
-
-  // Compute per-country totals for the selected year
   const isoArr=[],nameArr=[],valArr=[];
   for(const country of DATA.countries){
     const iso=DATA.iso[country];if(!iso)continue;
     const val=getCountryYearTotal(country,yi);
     isoArr.push(iso);nameArr.push(country);valArr.push(val);
   }
-
-  // Compute global total for share calculation
+  // Handle Serbia & Montenegro (SCG) → render for SRB, MNE, XKX
+  const scgIdx=isoArr.indexOf('SCG');
+  if(scgIdx>=0){
+    const scgVal=valArr[scgIdx];
+    // Remove SCG, add three modern codes
+    isoArr.splice(scgIdx,1);nameArr.splice(scgIdx,1);valArr.splice(scgIdx,1);
+    for(const iso of['SRB','MNE','XKX']){
+      isoArr.push(iso);nameArr.push('Serbia, Montenegro and Kosovo');valArr.push(scgVal);
+    }
+  }
   const globalTotal=valArr.reduce((a,b)=>a+b,0);
-  const displayVals=mapMetric==='share'
-    ? valArr.map(v=>globalTotal>0?Math.round(v/globalTotal*10000)/100:0)
+  const rawDisplayVals=mapMetric==='share'
+    ? valArr.map(v=>globalTotal>0?v/globalTotal*100:0)
     : valArr;
 
-  // Quintile thresholds (only from countries with >0)
-  const positive=displayVals.filter(v=>v>0).sort((a,b)=>a-b);
-  const q=i=>positive[Math.floor(i*positive.length/5)]||0;
-  const thresholds=[0,q(1),q(2),q(3),q(4)];
-  const tMax=positive[positive.length-1]||1;
+  // Compute quintile boundaries from positive values
+  const positive=[...rawDisplayVals].filter(v=>v>0).sort((a,b)=>a-b);
+  const n=positive.length;
+  const qBreaks=[0];
+  for(let q=1;q<=4;q++) qBreaks.push(positive[Math.floor(q*n/5)]||0);
 
-  return{isoArr,nameArr,displayVals,valArr,thresholds,tMax,globalTotal};
+  // Assign quintile rank 1–5 (0 = no data)
+  const quintileVals=rawDisplayVals.map(v=>{
+    if(v<=0)return 0;
+    for(let q=4;q>=1;q--) if(v>=qBreaks[q]) return q+1;
+    return 1;
+  });
+
+  // Legend labels — quintile boundary values, no decimals
+  const fmt=v=>mapMetric==='share'?(v<1?v.toFixed(2):Math.round(v))+'%':Math.round(v).toLocaleString();
+  const legendLabels=[
+    'No data',
+    `Q1: 0 – ${fmt(qBreaks[1])}`,
+    `Q2: ${fmt(qBreaks[1])} – ${fmt(qBreaks[2])}`,
+    `Q3: ${fmt(qBreaks[2])} – ${fmt(qBreaks[3])}`,
+    `Q4: ${fmt(qBreaks[3])} – ${fmt(qBreaks[4])}`,
+    `Q5: > ${fmt(qBreaks[4])}`,
+  ];
+
+  return{isoArr,nameArr,rawDisplayVals,valArr,quintileVals,qBreaks,legendLabels,globalTotal};
 }
 
 function renderMap(){
   if(!DATA)return;
   const d=getMapData();if(!d)return;
-  const{isoArr,nameArr,displayVals,valArr,thresholds,tMax,globalTotal}=d;
+  const{isoArr,nameArr,rawDisplayVals,valArr,quintileVals,qBreaks,legendLabels,globalTotal}=d;
   const isShare=mapMetric==='share';
-  const unitStr=isShare?'%':'Gg CO\u2082eq';
 
-  // 5-color quintile scale — teal/green for absolute, blue/purple for share
+  // Light→dark: green for absolute, blue for share
   const colorscale=isShare
-    ?[[0,'#1a1e28'],[0.001,'#1a3a5c'],[0.25,'#1d6fa4'],[0.5,'#2196f3'],[0.75,'#64b5f6'],[1,'#e3f2fd']]
-    :[[0,'#1a1e28'],[0.001,'#1a3d2b'],[0.25,'#1b6e3a'],[0.5,'#2e9e52'],[0.75,'#66bb6a'],[1,'#e8f5e9']];
-
-  // Quintile breakpoints for tickvals (no decimals)
-  const tickvals=thresholds.map(v=>Math.round(v));
-  tickvals.push(Math.round(tMax));
-  const ticktext=tickvals.map(v=>isShare?v+'%':v.toLocaleString());
+    ?[[0,'#1a1e28'],[0.01,'#dbeafe'],[0.2,'#93c5fd'],[0.4,'#3b82f6'],[0.6,'#1d4ed8'],[0.8,'#1e3a8a'],[1,'#0f172a']]
+    :[[0,'#1a1e28'],[0.01,'#dcfce7'],[0.2,'#86efac'],[0.4,'#22c55e'],[0.6,'#15803d'],[0.8,'#14532d'],[1,'#052e16']];
 
   const hoverText=nameArr.map((name,i)=>{
     const absVal=Math.round(valArr[i]).toLocaleString();
     const shareVal=globalTotal>0?(valArr[i]/globalTotal*100).toFixed(2)+'%':'n/a';
-    return `<b>${name}</b><br>Emissions: ${absVal} Gg CO\u2082eq<br>Global share: ${shareVal}`;
+    const q=quintileVals[i];
+    const qLabel=q>0?` · ${legendLabels[q]}`:'';
+    return `<b>${name}</b><br>Emissions: ${absVal} Gg CO\u2082eq<br>Global share: ${shareVal}${qLabel}`;
   });
 
   const trace={
     type:'choropleth',
     locations:isoArr,
-    z:displayVals,
+    z:quintileVals,
     text:hoverText,
     hovertemplate:'%{text}<extra></extra>',
     colorscale,
-    zmin:0,
-    zmax:tMax,
+    zmin:0, zmax:5,
     colorbar:{
-      title:{text:unitStr,font:{color:'#7a8099',size:11}},
-      tickvals,ticktext,
-      tickfont:{color:'#7a8099',size:10,family:'IBM Plex Mono'},
-      bgcolor:'rgba(19,22,29,0.85)',
+      title:{text:isShare?'Share of global':'Absolute emissions',font:{color:'#7a8099',size:10}},
+      tickvals:[0,1,2,3,4,5],
+      ticktext:legendLabels,
+      tickfont:{color:'#b0b8cc',size:10,family:'IBM Plex Mono'},
+      bgcolor:'rgba(13,15,20,.88)',
       bordercolor:'#252a38',
       borderwidth:1,
-      len:0.6,
-      thickness:14,
+      len:0.55,
+      thickness:16,
+      x:1.01,
     },
-    marker:{line:{color:'#252a38',width:0.5}},
+    marker:{line:{color:'#1a1e28',width:0.4}},
   };
 
   const layout={
     geo:{
-      showframe:false,
-      showcoastlines:false,
-      showland:true,landcolor:'#1a1e28',
+      showframe:false,showcoastlines:false,
+      showland:true,landcolor:'#1c2030',
       showocean:true,oceancolor:'#0d0f14',
-      showcountries:true,countrycolor:'#252a38',
+      showcountries:true,countrycolor:'#2a3048',
       bgcolor:'#0d0f14',
       projection:{type:'natural earth'},
     },
@@ -588,10 +624,12 @@ function renderMap(){
   Plotly.react('map',[trace],layout,{responsive:true,displayModeBar:true,
     modeBarButtonsToRemove:['select2d','lasso2d','toImage'],displaylogo:false});
 
-  // Update info strip
-  const sectorDesc=singleTotal?'All sectors':getSelectedSectorDesc();
-  document.getElementById('mapMetricInfo').textContent=
-    `${mapYear} · ${isShare?'Share of global':'Absolute'} · ${sectorDesc} · ${emissionSource}`;
+  // Update overlay badge
+  const sectorDesc=getSelectedSectorDesc();
+  document.getElementById('mapOverlayYear').textContent=mapYear;
+  document.getElementById('mapOverlayMetric').innerHTML=`Metric: <span>${isShare?'Share of Global (%)':'Absolute Emissions'}</span>`;
+  document.getElementById('mapOverlaySectors').innerHTML=`Sectors: <span>${sectorDesc}</span>`;
+  document.getElementById('mapOverlaySource').innerHTML=`Source: <span>${emissionSource.charAt(0).toUpperCase()+emissionSource.slice(1)}</span>`;
 }
 
 function getSelectedSectorDesc(){
@@ -614,7 +652,8 @@ function switchView(view){
   document.getElementById('cmpPanel').style.display=view==='map'?'none':'';
   document.getElementById('yearPanel').style.display=view==='map'?'none':'';
   document.getElementById('chartControls').style.display=view==='map'?'none':'';
-  document.getElementById('mapNote').classList.toggle('visible',view==='map');
+  document.getElementById('countryPanel').style.display=view==='map'?'none':'';
+  document.getElementById('mapNote').classList.toggle('visible',false);
   if(view==='map')renderMap();
 }
 
@@ -685,7 +724,7 @@ function startPlay(){
   playInterval=setInterval(()=>{
     mapYear=mapYear>=2024?1970:mapYear+1;
     document.getElementById('mapYearSlider').value=mapYear;
-    document.getElementById('mapYearLbl').textContent=mapYear;
+    document.getElementById('mapYearInput').value=mapYear;
     renderMap();
   },400);
 }
@@ -771,7 +810,16 @@ document.getElementById('mapMetricToggle').addEventListener('click',e=>{
   e.target.classList.add('active');renderMap();
 });
 document.getElementById('mapYearSlider').addEventListener('input',e=>{
-  mapYear=+e.target.value;document.getElementById('mapYearLbl').textContent=mapYear;renderMap();
+  mapYear=+e.target.value;
+  document.getElementById('mapYearInput').value=mapYear;
+  renderMap();
+});
+document.getElementById('mapYearInput').addEventListener('change',e=>{
+  let yr=Math.min(2024,Math.max(1970,+e.target.value||2024));
+  mapYear=yr;
+  document.getElementById('mapYearInput').value=yr;
+  document.getElementById('mapYearSlider').value=yr;
+  renderMap();
 });
 document.getElementById('playBtn').addEventListener('click',()=>{
   if(playInterval)stopPlay();else startPlay();
