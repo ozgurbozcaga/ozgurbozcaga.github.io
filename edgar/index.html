@@ -126,7 +126,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 #mapView{display:none;flex-direction:column;flex:1;min-height:0;}
 #mapView.visible{display:flex;}
 #chart{flex:1;min-height:0;}
-#map{flex:1;min-height:0;}
+#mapContainer{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;}
+#map{flex:1;min-height:0;width:100%;}
 
 /* MAP TOOLBAR */
 .map-toolbar{padding:10px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap;}
@@ -136,15 +137,13 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .play-btn{font-family:var(--font-mono);font-size:11px;padding:4px 12px;border:1px solid var(--accent);border-radius:3px;background:transparent;color:var(--accent);cursor:pointer;transition:all .15s;white-space:nowrap;}
 .play-btn:hover{background:var(--accent);color:var(--bg);}
 .play-btn.playing{background:var(--accent);color:var(--bg);}
-.map-metric-info{display:none;} /* removed from toolbar */
-.map-overlay{position:absolute;top:12px;left:12px;z-index:10;background:rgba(13,15,20,.88);border:1px solid var(--border);border-radius:5px;padding:8px 12px;pointer-events:none;backdrop-filter:blur(4px);}
+.map-metric-info{display:none;}
+.map-overlay{position:absolute;top:12px;left:12px;z-index:10;background:rgba(13,15,20,.9);border:1px solid var(--border);border-radius:5px;padding:8px 12px;pointer-events:none;backdrop-filter:blur(4px);}
 .map-overlay-year{font-family:var(--font-mono);font-size:22px;font-weight:600;color:var(--accent);line-height:1;}
 .map-overlay-row{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:3px;letter-spacing:.3px;}
 .map-overlay-row span{color:var(--text);}
-#mapView{position:relative;}
 .year-input{font-family:var(--font-mono);font-size:12px;width:52px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:var(--accent);padding:3px 6px;text-align:center;outline:none;}
 .year-input:focus{border-color:var(--accent);}
-/* hide spinners */
 .year-input::-webkit-inner-spin-button,.year-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .year-input[type=number]{-moz-appearance:textfield;}
 
@@ -266,14 +265,16 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <button class="play-btn" id="playBtn">&#9654; Play</button>
       </div>
     </div>
-    <!-- Overlay info badge -->
-    <div class="map-overlay" id="mapOverlay">
-      <div class="map-overlay-year" id="mapOverlayYear">2024</div>
-      <div class="map-overlay-row" id="mapOverlayMetric"></div>
-      <div class="map-overlay-row" id="mapOverlaySectors"></div>
-      <div class="map-overlay-row" id="mapOverlaySource"></div>
+    <!-- Map container holds both Plotly div and overlay badge -->
+    <div id="mapContainer">
+      <div id="map"></div>
+      <div class="map-overlay" id="mapOverlay">
+        <div class="map-overlay-year" id="mapOverlayYear">2024</div>
+        <div class="map-overlay-row" id="mapOverlayMetric"></div>
+        <div class="map-overlay-row" id="mapOverlaySectors"></div>
+        <div class="map-overlay-row" id="mapOverlaySource"></div>
+      </div>
     </div>
-    <div id="map"></div>
   </div>
 </main>
 </div>
@@ -571,16 +572,29 @@ function renderMap(){
   const{isoArr,nameArr,rawDisplayVals,valArr,quintileVals,qBreaks,legendLabels,globalTotal}=d;
   const isShare=mapMetric==='share';
 
-  // Light→dark: green for absolute, blue for share
-  const colorscale=isShare
-    ?[[0,'#1a1e28'],[0.01,'#dbeafe'],[0.2,'#93c5fd'],[0.4,'#3b82f6'],[0.6,'#1d4ed8'],[0.8,'#1e3a8a'],[1,'#0f172a']]
-    :[[0,'#1a1e28'],[0.01,'#dcfce7'],[0.2,'#86efac'],[0.4,'#22c55e'],[0.6,'#15803d'],[0.8,'#14532d'],[1,'#052e16']];
+  // Discrete 6-band colorscale (0=no data, 1=Q1…5=Q5)
+  // Each band occupies exactly 1/6 of the 0–5 z-range → step at every 1 unit
+  // Pattern: [pos, color],[pos+ε, color] repeated creates sharp steps
+  // Colors: background for no-data, then dark→light for Q1→Q5
+  const BG='#0d0f14';
+  const BANDS_GREEN=[BG,'#1a3d2b','#1b6e3a','#2e9e52','#6abf69','#a8e6b0']; // dark→light green
+  const BANDS_BLUE =[BG,'#0f2d6b','#1549b8','#3b82f6','#7db8f7','#b8d9fa']; // dark→light blue
+  const bands=isShare?BANDS_BLUE:BANDS_GREEN;
+  const e=0.001; // tiny epsilon for sharp step
+  const cs=[
+    [0,           bands[0]],[1/5-e,  bands[0]], // no data
+    [1/5,         bands[1]],[2/5-e,  bands[1]], // Q1
+    [2/5,         bands[2]],[3/5-e,  bands[2]], // Q2
+    [3/5,         bands[3]],[4/5-e,  bands[3]], // Q3
+    [4/5,         bands[4]],[5/5-e,  bands[4]], // Q4
+    [5/5,         bands[5]],                    // Q5
+  ];
 
   const hoverText=nameArr.map((name,i)=>{
     const absVal=Math.round(valArr[i]).toLocaleString();
     const shareVal=globalTotal>0?(valArr[i]/globalTotal*100).toFixed(2)+'%':'n/a';
     const q=quintileVals[i];
-    const qLabel=q>0?` · ${legendLabels[q]}`:'';
+    const qLabel=q>0?`<br>${legendLabels[q]}`:'';
     return `<b>${name}</b><br>Emissions: ${absVal} Gg CO\u2082eq<br>Global share: ${shareVal}${qLabel}`;
   });
 
@@ -590,27 +604,28 @@ function renderMap(){
     z:quintileVals,
     text:hoverText,
     hovertemplate:'%{text}<extra></extra>',
-    colorscale,
+    colorscale:cs,
     zmin:0, zmax:5,
+    showscale:true,
     colorbar:{
-      title:{text:isShare?'Share of global':'Absolute emissions',font:{color:'#7a8099',size:10}},
-      tickvals:[0,1,2,3,4,5],
-      ticktext:legendLabels,
+      title:{text:isShare?'Global share':'Absolute emissions',font:{color:'#7a8099',size:10}},
+      tickvals:[0.5,1.5,2.5,3.5,4.5,5.5].map(v=>v*(5/6)), // centre of each 1/6 band mapped to 0-5
+      ticktext:legendLabels, // ['No data','Q1: …','Q2: …','Q3: …','Q4: …','Q5: …']
       tickfont:{color:'#b0b8cc',size:10,family:'IBM Plex Mono'},
-      bgcolor:'rgba(13,15,20,.88)',
+      bgcolor:'rgba(13,15,20,.9)',
       bordercolor:'#252a38',
       borderwidth:1,
-      len:0.55,
+      len:0.6,
       thickness:16,
       x:1.01,
     },
-    marker:{line:{color:'#1a1e28',width:0.4}},
+    marker:{line:{color:'#1a2030',width:0.3}},
   };
 
   const layout={
     geo:{
       showframe:false,showcoastlines:false,
-      showland:true,landcolor:'#1c2030',
+      showland:true,landcolor:'#1a1e28',
       showocean:true,oceancolor:'#0d0f14',
       showcountries:true,countrycolor:'#2a3048',
       bgcolor:'#0d0f14',
