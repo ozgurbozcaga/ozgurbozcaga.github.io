@@ -6,11 +6,11 @@
 # `jekyll serve`. If you change this file, please restart the server process.
 
 # Site Settings
-locale                   : "en-US"
-title                    : "Mustafa Ozgur Bozcaga"
+locale                   : "en-GB"
+title                    : "Mustafa Özgür Bozçağa"
 title_separator          : "-"
-name                     : &name "Mustafa Ozgur Bozcaga"
-description              : &description "Consultant at the World Bank Group"
+name                     : &name "Mustafa Özgür Bozçağa"
+description              : &description "Applied economist and Regovia founder working on energy and power-sector economics, climate regulation, carbon pricing and economic policy appraisal."
 url                      : https://ozgurbozcaga.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
 repository               : "ozgurbozcaga.github.io"
@@ -80,14 +80,14 @@ analytics:
 
 # Site Author
 author:
-  name             : "Mustafa Ozgur Bozcaga"
+  name             : "Mustafa Özgür Bozçağa"
   avatar           : "profil_foto1.jpg"
-  bio              : "Consultant at the World Bank Group"
+  bio              : "Founder and Principal, Regovia Ltd"
   location         : "London, UK"
   employer         :
   pubmed           : 
   googlescholar    :  # "https://scholar.google.com/citations?user=LAX4r2IAAAAJ&hl=en"
-  email            : "ozgurbozcaga@gmail.com"
+  email            : "ozgur@regovia.co.uk"
   researchgate     :  # example: "https://www.researchgate.net/profile/yourprofile"
   uri              :
   bitbucket        :
