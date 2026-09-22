@@ -9,4 +9,4 @@ redirect_from:
 
 {% include base_path %}
 
-To access my CV please click on this [link](https://www.dropbox.com/scl/fi/xre44x7hiumlth7yzj74q/Bozcaga_CV_Sept25.pdf?rlkey=aqma30vxyl034rls7oqy2ozwk&st=t6s26fsp&dl=0)
+[Download my current CV]({{ "/files/Bozcaga_CV_202609.pdf" | relative_url }}).
